@@ -166,6 +166,7 @@ def send_help(message):
 
 # Botun fasiləsiz işləməsi üçün polling başlat
 try:
+    bot.remove_webhook()
     bot.polling(none_stop=True, interval=0, timeout=120)
 except Exception as e:
     print("Bot polling xətası:", e)
