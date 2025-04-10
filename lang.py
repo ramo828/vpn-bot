@@ -2,15 +2,31 @@ lang = dict()
 
 # Azərbaycan dili
 lang["az"] = {
-    "ext":{
-        "active":"Aktiv",
-        "inactive":"Passiv",
+    "ext": {
+        "active": "Aktiv",
+        "inactive": "Passiv",
+    },
+    "buttons": {
+        "connect": "Qoşul",
+        "renew": "Təzələ",
+        "active_keys": "Aktiv açarlarım",
+        "change_protocol": "Protokolu dəyiş",
+        "change_country": "Ölkəni dəyiş",
+        "router_tv": "Routerlər və Android TV",
+        "invite": "Dəvət et",
+        "partnership": "Tərəfdaşlıq"
+    },
+    "commands": {
+        "start": "Botu başlat",
+        "help": "Yardım mesajını göstər",
+        "create": "VPN yarat",
+        "user_info": "İstifadəçi məlumatlarını göstər"
     },
     "tg_user_data": {
         "first_name": "Ad",
         "last_name": "Soyad",
         "username": "İstifadəçi adı",
-        "tg_id":" Telegram ID",
+        "tg_id": "Telegram ID",
         "phone_number": "Telefon nömrəsi",
         "language_code": "Dil kodu",
     },
@@ -45,9 +61,19 @@ lang["az"] = {
 
 # Türkçe
 lang["tr"] = {
-     "ext":{
-        "active":"Aktiv",
-        "inactive":"Pasiv",
+    "ext": {
+        "active": "Aktiv",
+        "inactive": "Pasiv",
+    },
+    "buttons": {
+        "connect": "Bağlan",
+        "renew": "Yenile",
+        "active_keys": "Aktif anahtarlarım",
+        "change_protocol": "Protokolü değiştir",
+        "change_country": "Ülkeyi değiştir",
+        "router_tv": "Routerlar ve Android TV",
+        "invite": "Davet et",
+        "partnership": "Ortaklık"
     },
     "commands": {
         "start": "Botu başlat",
@@ -59,7 +85,7 @@ lang["tr"] = {
         "first_name": "Ad",
         "last_name": "Soyad",
         "username": "Kullanıcı adı",
-        "tg_id":"Telegram ID",
+        "tg_id": "Telegram ID",
         "phone_number": "Telefon numarası",
         "language_code": "Dil kodu",
     },
@@ -94,21 +120,31 @@ lang["tr"] = {
 
 # Русский
 lang["ru"] = {
-     "ext":{
-        "active":"Активный",
-        "inactive":"Пассивный",
+    "ext": {
+        "active": "Активный",
+        "inactive": "Пассивный",
+    },
+    "buttons": {
+        "connect": "Подключиться",
+        "renew": "Продлить",
+        "active_keys": "Мои активные ключи",
+        "change_protocol": "Изменить протокол",
+        "change_country": "Изменить страну",
+        "router_tv": "В роутеры и Android TV",
+        "invite": "Пригласить",
+        "partnership": "Партнерка"
     },
     "commands": {
-    "start": "Запустить бота",
-    "help": "Показать справочное сообщение",
-    "create": "Создать VPN",
-    "user_info": "Показать информацию о пользователе"
-},
+        "start": "Запустить бота",
+        "help": "Показать справочное сообщение",
+        "create": "Создать VPN",
+        "user_info": "Показать информацию о пользователе"
+    },
     "tg_user_data": {
         "first_name": "Имя",
         "last_name": "Фамилия",
         "username": "Имя пользователя",
-        "tg_id":"Telegram ID",
+        "tg_id": "Telegram ID",
         "phone_number": "Номер телефона",
         "language_code": "Код языка",
     },
@@ -143,21 +179,31 @@ lang["ru"] = {
 
 # English
 lang["en"] = {
-     "ext":{
-        "active":"Active",
-        "inactive":"Inactive",
+    "ext": {
+        "active": "Active",
+        "inactive": "Inactive",
+    },
+    "buttons": {
+        "connect": "Connect",
+        "renew": "Renew",
+        "active_keys": "My Active Keys",
+        "change_protocol": "Change Protocol",
+        "change_country": "Change Country",
+        "router_tv": "Router and Android TV",
+        "invite": "Invite",
+        "partnership": "Partnership"
     },
     "commands": {
-    "start": "Start the bot",
-    "help": "Show help message",
-    "create": "Create VPN",
-    "user_info": "Show user information"
-},
+        "start": "Start the bot",
+        "help": "Show help message",
+        "create": "Create VPN",
+        "user_info": "Show user information"
+    },
     "tg_user_data": {
         "first_name": "First Name",
         "last_name": "Last Name",
         "username": "Username",
-        "tg_id":"Telegram ID",
+        "tg_id": "Telegram ID",
         "phone_number": "Phone Number",
         "language_code": "Language Code",
     },
@@ -172,20 +218,4 @@ lang["en"] = {
     "start_message": "Hello! To create a VPN, type /create.",
     "vpn_created": "VPN key has been created",
     "vpn_error": "An error occurred while creating the VPN. Please try again later.",
-    "user_not_found": "User not found. Please type /start first.",
-    "vpn_already_exists": "VPN is already created. To recreate, type /delete.",
-    "vpn_deleted": "VPN key has been deleted.",
-    "error_bot": "An error occurred in the bot. Please try again later.",
-    "help_message": """
-/start - Start the bot and register the user.
-/help - Show available commands.
-/create - Create a new VPN account (if user is active).
-/user_info - Show user information.
-""", 
-    "errors": {
-        "vpn_error": "Error while creating VPN.",
-        "error_bot": "Bot error occurred.",
-        "polling_error": "Polling error occurred.",
-        "payment_error": "Error during payment process.",
-    },
 }
