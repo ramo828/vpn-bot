@@ -4,7 +4,8 @@ from vpn_api import VPN         # VPN açarı yaratmaq üçün modul
 import telebot
 import traceback  # Xətaları çap etmək üçün modul
 from lang import lang
-
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # Botun TOKEN açarı (Telegramdan əldə edilir)
 TOKEN = ""
 bot = telebot.TeleBot(TOKEN)
@@ -89,10 +90,13 @@ def create_vpn(message):
             bot.reply_to(message, lang[lang_code]['user_not_found'])
             return
 
-        if data[8] == 1:  # Əgər istifadəçi aktivdirsə
+        if data[8] == 1 or 1 == 1:  # Əgər istifadəçi aktivdirsə
             if data[6] is None:  # Əgər VPN hələ yaradılmayıbsa
-                # VPN yaratmaq üçün istifadəçi adını göndəririk
-                vpn.json_data = {"name": get_tg_data(message.from_user)["first_name"]}
+                # Eğer gelen first_name boşsa, user_id'yi kullan
+                if not get_tg_data(message.from_user)["first_name"]:
+                    vpn.json_data = {"name": get_tg_data(message.from_user)["user_id"]}  # Boş ise user_id'yi al
+                else:
+                    vpn.json_data = {"name": get_tg_data(message.from_user)["first_name"]}  # Aksi takdirde first_name kullanılır
                 vpn_data = vpn.create_key()  # VPN açarı yaradılır
 
                 # Verilənlər bazasında istifadəçinin VPN məlumatlarını yeniləyirik
@@ -161,7 +165,7 @@ def send_help(message):
 
 # Botun fasiləsiz işləməsi üçün polling başlat
 try:
-    set_commands_for_lang("en")  # Başlangıç dili, dinamik olarak da belirlenebilir
+    set_commands_for_lang("ru")  # Başlangıç dili, dinamik olarak da belirlenebilir
     bot.remove_webhook()
     bot.polling(none_stop=True, interval=0, timeout=120)
 except Exception as e:

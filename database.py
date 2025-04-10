@@ -7,12 +7,13 @@ class Database:
         self.create_table()
 
     def create_table(self):
+    # Eğer tablo varsa, silinir
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 surname TEXT,
-                tg_username TEXT NOT NULL UNIQUE,
+                tg_username TEXT,
                 is_admin INTEGER DEFAULT 0,
                 telegram_id TEXT NOT NULL UNIQUE,
                 vpn_server TEXT,
@@ -24,15 +25,19 @@ class Database:
         ''')
         self.connection.commit()
 
-    def insert_user(self, name, surname, tg_username,telegram_id, vpn_server, vpn_id=None, vpn_status=0, is_admin=0):
+    def insert_user(self, name, surname, tg_username, telegram_id, vpn_server, vpn_id=None, vpn_status=0, is_admin=0):
         try:
+            if not tg_username:  # Eğer tg_username boşsa, None gönder
+                tg_username = None
+            
             self.cursor.execute('''
                 INSERT INTO users (name, surname, tg_username, telegram_id, vpn_server, vpn_id, vpn_status, is_admin)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (name, surname, tg_username,telegram_id, vpn_server, vpn_id, vpn_status, is_admin))
+            ''', (name, surname, tg_username, telegram_id, vpn_server, vpn_id, vpn_status, is_admin))
             self.connection.commit()
         except sqlite3.IntegrityError as e:
             print(f"Error inserting user: {e}")
+
 
     def fetch_users(self):
         self.cursor.execute('SELECT * FROM users')
