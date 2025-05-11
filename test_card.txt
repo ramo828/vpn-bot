@@ -1,0 +1,15 @@
+Visa (3-D Secure): 4242 4242 4242 4242
+
+MasterCard (3-D Secure): 5555 5555 5555 4444
+
+Visa (3-D Secure): 4012 8888 8888 1881
+
+MasterCard (3-D Secure): 5105 1051 0510 5100
+
+Visa (non-3DS): 4111 1111 1111 1111
+
+MasterCard (non-3DS): 5200 8282 8282 8210
+
+Visa (non-3DS): 4000 0566 5566 5556
+
+MasterCard (non-3DS): 5404 0000 0000 0043
