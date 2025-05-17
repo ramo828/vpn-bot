@@ -1,9 +1,10 @@
 from requests import get, post, put, delete
+from settings import setting
 
 class VPN:
     def __init__(self, json_data= {}):
         self.json_data = json_data
-        self.api_url = "https://151.243.81.3:46118/C80-O66Wke-o86w0-oxXZQ"
+        self.api_url = f"https://{setting['pay_server_url']}:{setting['pay_server_port']}/C80-O66Wke-o86w0-oxXZQ"
         self.keys = "/access-keys/"
     
     def create_key(self, key_id=-1):

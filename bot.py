@@ -199,7 +199,7 @@ def send_help(message):
 @bot.message_handler(commands=["webapp"])
 def send_web_app(message):
     markup = InlineKeyboardMarkup()
-    web_app = WebAppInfo(url=f"http://{setting['server_url']}/pay?amount=250.0&currency=RUB&description=Premium+Üyelik&accountId=test@example.com&invoiceId=1234")
+    web_app = WebAppInfo(url=f"http://{setting['pay_server_url']}:{setting['pay_server_port']}/pay?amount=250.0&currency=RUB&description=Premium+Üyelik&accountId=test@example.com&invoiceId=1234")
     markup.add(InlineKeyboardButton("Formu Aç", web_app=web_app))
     bot.send_message(message.chat.id, "Formu buradan doldurabilirsiniz:", reply_markup=markup)
 
