@@ -6,6 +6,8 @@ import traceback  # Xətaları çap etmək üçün modul
 from settings.lang import lang
 from settings.setting import setting
 import urllib3
+from pyngrok import ngrok, conf
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # Botun TOKEN açarı (Telegramdan əldə edilir)
 
@@ -15,6 +17,30 @@ bot = telebot.TeleBot(setting["TOKEN"])
 admin_id = setting["ADMIN_ID"]
 # Dekorativ xətt (mesajları daha oxunaqlı etmək üçün)
 seperator = setting["seperator"]
+import subprocess
+import re
+
+def start_telebit():
+    public_url = ""
+    process = subprocess.Popen(
+        ["telebit", "http", "8000"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        universal_newlines=True
+    )
+
+    for line in process.stdout:
+        print(line.strip())
+        match = re.search(r'https://[a-zA-Z0-9\-]+\.telebit\.io', line)
+        if match:
+            public_url = match.group(0)
+            print("Telebit URL:", public_url)
+            break
+    return public_url
+
+public_url = start_telebit()
+
+
 
 # Dil kodunu almaq üçün köməkçi funksiya
 def get_lang_code(message):
@@ -199,7 +225,7 @@ def send_help(message):
 @bot.message_handler(commands=["webapp"])
 def send_web_app(message):
     markup = InlineKeyboardMarkup()
-    web_app = WebAppInfo(url=f"http://{setting['pay_server_url']}:{setting['pay_server_port']}/pay?amount=250.0&currency=RUB&description=Premium+Üyelik&accountId=test@example.com&invoiceId=1234")
+    web_app = WebAppInfo(url=f"{public_url}/pay?amount=250.0&currency=RUB&description=Premium+Üyelik&accountId=test@example.com&invoiceId=1234")
     markup.add(InlineKeyboardButton("Formu Aç", web_app=web_app))
     bot.send_message(message.chat.id, "Formu buradan doldurabilirsiniz:", reply_markup=markup)
 
