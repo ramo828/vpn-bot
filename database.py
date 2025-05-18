@@ -91,6 +91,10 @@ class Database:
         self.cursor.execute('SELECT language FROM users WHERE telegram_id = ?', (telegram_id,))
         result = self.cursor.fetchone()
         return result[0] if result else None
-    
+        
+    def set_user_language(self, telegram_id, lang_code="en"):
+        self.cursor.execute('UPDATE users SET language = ? WHERE telegram_id = ?', (lang_code, telegram_id))
+        self.connection.commit( )
+
     def close(self):
         self.connection.close()
