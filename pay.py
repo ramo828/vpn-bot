@@ -4,10 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 from settings.lang import lang as lng
 from settings.setting import setting
-from os import system
+from time import sleep
 from database import Database
 from html_data.pay_data import get_html
-from bot import send_message_to_admin, send_message_to_user
+from bot import send_message_to_admin, send_message_to_user, clear_pay_message
 import json
 
 app = FastAPI()
@@ -61,12 +61,16 @@ async def payment_status(status: bool = Query(..., description="Payment status")
     if status:
         print("Payment was successful")
         db.update_vpn_access(1, telegram_id)
-        send_message_to_admin(f"Payment was successful for user: {telegram_id}")
+        print(telegram_id)
         send_message_to_user(int(telegram_id), lng[default_language]["payment"]["pay_success_message"])
+        sleep(5)
+        send_message_to_admin(f"Payment was successful for user: {telegram_id}")
+        clear_pay_message()
         return JSONResponse({"message": lng[default_language]["payment"]["pay_success_message"], "success": True})
     else:
         db.update_vpn_access(0, telegram_id)
         print("Payment failed")
-        send_message_to_admin(f"Payment failed for user: {telegram_id}")
         send_message_to_user(int(telegram_id), lng[default_language]["payment"]["pay_error_message"])
+        sleep(5)
+        send_message_to_admin(f"Payment failed for user: {telegram_id}")
         return JSONResponse({"message": lng[default_language]["payment"]["pay_error_message"], "success": False})

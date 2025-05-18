@@ -18,9 +18,9 @@ bot = telebot.TeleBot(setting["TOKEN"])
 admin_id = setting["ADMIN_ID"]
 # Dekorativ xətt (mesajları daha oxunaqlı etmək üçün)
 seperator = setting["seperator"]
-
+pay_message_ids = []
 public_url = start_telebit()
-
+default_user_id = 0
 
 
 # Dil kodunu almaq üçün köməkçi funksiya
@@ -47,7 +47,7 @@ def set_commands_for_lang(lang_code="az"):
         
         # Butonları oluştur (örnek olarak /start mesajına ekleyeceğiz)
         return InlineKeyboardMarkup(row_width=2).add(
-            InlineKeyboardButton(button_texts["connect"], callback_data="test"),
+            InlineKeyboardButton(button_texts["connect"], callback_data="buy"),
             InlineKeyboardButton(button_texts["renew"], callback_data="renew"),
             InlineKeyboardButton(button_texts["active_keys"], callback_data="active_keys"),
             InlineKeyboardButton(button_texts["change_protocol"], callback_data="change_protocol"),
@@ -68,6 +68,8 @@ vpn = VPN()
 
 # Telegram istifadəçisindən alınan məlumatları strukturlaşdırırıq
 def get_tg_data(user):
+    global default_user_id
+    default_user_id = user.id
     return {
         'first_name': user.first_name,
         'last_name': user.last_name,
@@ -192,7 +194,7 @@ def send_help(message):
 
 # /help əmri - mövcud komandaları izah edir
 @bot.message_handler(commands=['test'])
-def send_help(message):
+def test(message):
     lang_code = get_lang_code(message)
     try:
         print(lang_code)
@@ -201,14 +203,12 @@ def send_help(message):
         print("Xəta /help:", e)
         traceback.print_exc()
 
-# /webapp komutu: sadece Web App butonunu gönderir
-@bot.message_handler(commands=["webapp"])
-def send_web_app(message):
-    lang_code = get_lang_code(message)
-    user_status = db.is_vpn_active(message.from_user.id)
+def send_web_app(messsage_two):
+    lang_code = get_lang_code(messsage_two)
+    user_status = db.is_vpn_active(messsage_two.from_user.id)
 
     if user_status == 1:
-        bot.send_message(message.chat.id, lang[lang_code]["vpn_already_exists"])
+        bot.send_message(messsage_two.chat.id, lang[lang_code]["vpn_already_exists"])
         return
 
     # VPN aktif değilse ödeme sayfası Web App butonunu gönder
@@ -218,18 +218,29 @@ def send_web_app(message):
         f"?amount=250.0"
         f"&currency=RUB"
         f"&description={quote(lang[lang_code]['payment']['description'])}"
-        f"&accountId={message.from_user.id}"
-        f"&invoiceId=inv_{message.from_user.id}"
-        f"&tg_id={message.from_user.id}"
+        f"&accountId={messsage_two.from_user.id}"
+        f"&invoiceId=inv_{messsage_two.from_user.id}"
+        f"&tg_id={default_user_id}"
         f"&lang={lang_code}"
     )
     web_app = WebAppInfo(url=web_app_url)
+    if(db.is_vpn_active(messsage_two.from_user.id) == 1):
+        bot.send_message(messsage_two.chat.id, lang[lang_code]["vpn_already_exists"])
+        return
     markup.add(InlineKeyboardButton(lang[lang_code]["payment"]["button"], web_app=web_app))
-    bot.send_message(
-        message.chat.id,
+    pay_message_ids.append(bot.send_message(
+        messsage_two.chat.id,
         lang[lang_code]["payment"]["description"],
         reply_markup=markup
-    )
+    ))
+
+def clear_pay_message():
+    for message in pay_message_ids:
+        try:
+            bot.delete_message(message.chat.id, message.message_id)
+        except Exception as e:
+            print("Xəta mesaj silinərkən:", e)
+    pay_message_ids.clear()
 
 def send_message_to_admin(message):
     admin_chat_id = int(setting["ADMIN_ID"][2])  # Admin'in Telegram chat ID'sini buraya yazın
@@ -242,12 +253,9 @@ def send_message_to_user(telegram_id: int, message: str):
 def handle_callback(call):
     lang_code = get_lang_code(call.message)  # Dil ayarı
     try:
-        # Hangi butona tıklandığını kontrol et
-        if call.data == "test":
-            bot.answer_callback_query(call.id, "Test butonuna tıklandı! ✅")
-            # Örnek: Yeni bir mesaj gönder
-            bot.send_message(call.message.chat.id, "Bu bir test mesajıdır 🧪")
-
+        if call.data == "buy":
+           send_web_app(call.message)
+           
         elif call.data == "renew":
             bot.answer_callback_query(call.id, "Ödeme yenileniyor...")
             # Ödeme işlemleri burada
