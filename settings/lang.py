@@ -38,6 +38,14 @@ lang["az"] = {
         "expire_date": "Bitmə tarixi",
         "update_date": "Yenilənmə tarixi",
     },
+    "payment" :  {
+        "pay_success_message": "Ödəniş uğurla tamamlandı",
+        "pay_error_message": "Ödəniş zamanı xəta baş verdi",
+        "title": "Ödəniş Səhifəsi",
+        "description": "Ödəniş təsviri",
+        "amount": "Ödəniş məbləği",
+        "button": "Ödə",
+    },
     "start_message": "Salam! VPN yaratmaq üçün /create əmri yazın.",
     "vpn_created": "VPN açarı yaradıldı",
     "vpn_error": "VPN yaratmaqda xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin.",
@@ -96,6 +104,14 @@ lang["tr"] = {
         "create_date": "Oluşturulma tarihi",
         "expire_date": "Bitiş tarihi",
         "update_date": "Güncelleme tarihi",
+    },
+    "payment":  {
+        "pay_success_message": "Ödeme başarılı",
+        "pay_error_message": "Ödeme sırasında bir hata oluştu",
+        "title": "Ödeme Sayfası",
+        "description": "Ödeme açıklaması",
+        "amount": "Ödeme tutarı",
+        "button": "Şimdi Öde",
     },
     "start_message": "Merhaba! VPN oluşturmak için /create komutunu yazın.",
     "vpn_created": "VPN anahtarı oluşturuldu",
@@ -156,6 +172,14 @@ lang["ru"] = {
         "expire_date": "Дата окончания",
         "update_date": "Дата обновления",
     },
+    "payment": {
+        "pay_success_message": "Платеж прошёл успешно",
+        "pay_error_message": "Ошибка при оплате",
+        "title": "Страница оплаты",
+        "description": "Описание платежа",
+        "amount": "Сумма платежа",
+        "button": "Оплатить",
+    },
     "start_message": "Привет! Чтобы создать VPN, используйте команду /create.",
     "vpn_created": "VPN ключ успешно создан",
     "vpn_error": "Ошибка при создании VPN. Пожалуйста, попробуйте позже.",
@@ -175,6 +199,7 @@ lang["ru"] = {
         "polling_error": "Ошибка во время polling.",
         "payment_error": "Ошибка во время оплаты.",
     },
+
 }
 
 # English
@@ -214,6 +239,14 @@ lang["en"] = {
         "create_date": "Creation Date",
         "expire_date": "Expiration Date",
         "update_date": "Update Date",
+    },
+     "payment": {
+        "pay_success_message": "Payment successful",
+        "pay_error_message": "Payment error",
+        "title": "Payment Page",
+        "description": "Payment description",
+        "amount": "Payment amount",
+        "button": "Pay Now",
     },
     "start_message": "Hello! To create a VPN, type /create.",
     "vpn_created": "VPN key has been created",

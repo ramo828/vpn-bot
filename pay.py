@@ -1,9 +1,27 @@
 from fastapi import FastAPI, Query
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
+from settings.lang import lang as lng
+from settings.setting import setting
+from os import system
+from database import Database
+from html_data.pay_data import get_html
+from bot import send_message_to_admin, send_message_to_user
 import json
 
 app = FastAPI()
+db = Database("vpn_users.db")
+
+cloud_api = setting['cloud_api']
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
+)
+telegram_id = ""
+default_language = "en"
 
 @app.get("/pay", response_class=HTMLResponse)
 async def payment_page(
@@ -11,85 +29,44 @@ async def payment_page(
     currency: str = Query("RUB", description="Currency"),
     description: str = Query("Ödeme işlemi", description="Payment description"),
     accountId: str = Query("user@example.com", description="User account ID"),
+    tg_id: int = Query(..., description="User Telegram ID"),
     invoiceId: Optional[str] = Query(None, description="Invoice ID"),
     skin: Optional[str] = Query("mini", description="Widget skin"),
-    data: Optional[str] = Query("{}", description="Extra data as JSON string")
+    data: Optional[str] = Query("{}", description="Extra data as JSON string"),
+    language: Optional[str] = Query("tr", description="Language code (az, tr, en, ru)")
 ):
+    global telegram_id
+    global default_language
+    
+    telegram_id = str(tg_id)
+    default_language = language
     try:
         data_dict = json.loads(data)
     except json.JSONDecodeError:
         data_dict = {}
 
-    html_content = f"""
-    <!DOCTYPE html>
-    <html lang="tr">
-    <head>
-        <meta charset="UTF-8">
-        <title>Ödeme Sayfası</title>
-        <script src="https://widget.cloudpayments.ru/bundles/cloudpayments.js"></script>
-        <style>
-            body {{
-                font-family: Arial, sans-serif;
-                background: #f9f9f9;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                margin: 0;
-            }}
-            .container {{
-                background: white;
-                padding: 30px;
-                border-radius: 12px;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-                text-align: center;
-            }}
-            button {{
-                background-color: #4CAF50;
-                color: white;
-                border: none;
-                padding: 15px 30px;
-                font-size: 18px;
-                border-radius: 8px;
-                cursor: pointer;
-            }}
-            button:hover {{
-                background-color: #45a049;
-            }}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h2>Ödeme İşlemi</h2>
-            <p>{description}</p>
-            <p>Tutar: {amount} {currency}</p>
-            <button onclick="pay()">Öde</button>
-        </div>
+    return HTMLResponse(get_html(
+        amount=amount,
+        currency=currency,
+        description=description,
+        accountId=accountId,
+        invoiceId=invoiceId,
+        skin=skin,
+        data_dict=data_dict,
+        language=language
+    ))
 
-        <script>
-        function pay() {{
-            var widget = new cp.CloudPayments();
-            widget.charge({{
-                publicId: 'test_api_00000000000000000000001',
-                description: '{description}',
-                amount: {amount},
-                currency: '{currency}',
-                accountId: '{accountId}',
-                invoiceId: '{invoiceId or ""}',
-                skin: '{skin}',
-                data: {json.dumps(data_dict)}
-            }},
-            {{
-                onSuccess: function (options) {{
-                    alert('Ödeme başarılı');
-                }},
-                onFail: function (reason, options) {{
-                    alert('Ödeme başarısız');
-                }}
-            }});
-        }}
-        </script>
-    </body>
-    </html>
-    """
-    return HTMLResponse(content=html_content)
+@app.get("/payment_status")
+async def payment_status(status: bool = Query(..., description="Payment status")):
+    if status:
+        print("Payment was successful")
+        db.update_vpn_access(1, telegram_id)
+        send_message_to_admin(f"Payment was successful for user: {telegram_id}")
+        send_message_to_user(int(telegram_id), lng[default_language]["payment"]["pay_success_message"])
+        return JSONResponse({"message": lng[default_language]["payment"]["pay_success_message"], "success": True})
+    else:
+        db.update_vpn_access(0, telegram_id)
+        print("Payment failed")
+        send_message_to_admin(f"Payment failed for user: {telegram_id}")
+        send_message_to_user(int(telegram_id), lng[default_language]["payment"]["pay_error_message"])
+        return JSONResponse({"message": lng[default_language]["payment"]["pay_error_message"], "success": False})

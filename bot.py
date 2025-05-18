@@ -6,8 +6,9 @@ import traceback  # Xətaları çap etmək üçün modul
 from settings.lang import lang
 from settings.setting import setting
 import urllib3
-from pyngrok import ngrok, conf
-
+from urllib.parse import quote
+import json
+from utility.util import start_telebit
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # Botun TOKEN açarı (Telegramdan əldə edilir)
 
@@ -17,26 +18,6 @@ bot = telebot.TeleBot(setting["TOKEN"])
 admin_id = setting["ADMIN_ID"]
 # Dekorativ xətt (mesajları daha oxunaqlı etmək üçün)
 seperator = setting["seperator"]
-import subprocess
-import re
-
-def start_telebit():
-    public_url = ""
-    process = subprocess.Popen(
-        ["telebit", "http", "8000"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        universal_newlines=True
-    )
-
-    for line in process.stdout:
-        print(line.strip())
-        match = re.search(r'https://[a-zA-Z0-9\-]+\.telebit\.io', line)
-        if match:
-            public_url = match.group(0)
-            print("Telebit URL:", public_url)
-            break
-    return public_url
 
 public_url = start_telebit()
 
@@ -136,7 +117,7 @@ def create_vpn(message):
             bot.reply_to(message, lang[lang_code]['user_not_found'])
             return
 
-        if data[8] == 1 or 1 == 1:  # Əgər istifadəçi aktivdirsə
+        if data[8] == 1 :  # Əgər istifadəçi aktivdirsə
             if data[6] is None:  # Əgər VPN hələ yaradılmayıbsa
                 # Eğer gelen first_name boşsa, user_id'yi kullan
                 if not get_tg_data(message.from_user)["first_name"]:
@@ -149,8 +130,7 @@ def create_vpn(message):
                 db.update_vpn_status(
                     telegram_id=message.from_user.id,
                     vpn_server=vpn_data.get("accessUrl"),
-                    vpn_id=vpn_data.get("id"),
-                    vpn_status=1
+                    vpn_id=vpn_data.get("id")
                 )
                 bot.reply_to(message, lang[lang_code]["vpn_created"]+"✅\n\n" + str(vpn_data))
             else:
@@ -221,15 +201,42 @@ def send_help(message):
         print("Xəta /help:", e)
         traceback.print_exc()
 
-
+# /webapp komutu: sadece Web App butonunu gönderir
 @bot.message_handler(commands=["webapp"])
 def send_web_app(message):
+    lang_code = get_lang_code(message)
+    user_status = db.is_vpn_active(message.from_user.id)
+
+    if user_status == 1:
+        bot.send_message(message.chat.id, lang[lang_code]["vpn_already_exists"])
+        return
+
+    # VPN aktif değilse ödeme sayfası Web App butonunu gönder
     markup = InlineKeyboardMarkup()
-    web_app = WebAppInfo(url=f"{public_url}/pay?amount=250.0&currency=RUB&description=Premium+Üyelik&accountId=test@example.com&invoiceId=1234")
-    markup.add(InlineKeyboardButton("Formu Aç", web_app=web_app))
-    bot.send_message(message.chat.id, "Formu buradan doldurabilirsiniz:", reply_markup=markup)
+    web_app_url = (
+        f"{public_url}/pay"
+        f"?amount=250.0"
+        f"&currency=RUB"
+        f"&description={quote(lang[lang_code]['payment']['description'])}"
+        f"&accountId={message.from_user.id}"
+        f"&invoiceId=inv_{message.from_user.id}"
+        f"&tg_id={message.from_user.id}"
+        f"&lang={lang_code}"
+    )
+    web_app = WebAppInfo(url=web_app_url)
+    markup.add(InlineKeyboardButton(lang[lang_code]["payment"]["button"], web_app=web_app))
+    bot.send_message(
+        message.chat.id,
+        lang[lang_code]["payment"]["description"],
+        reply_markup=markup
+    )
 
+def send_message_to_admin(message):
+    admin_chat_id = int(setting["ADMIN_ID"][2])  # Admin'in Telegram chat ID'sini buraya yazın
+    bot.send_message(admin_chat_id, f"Mesaj: :\n{message}")
 
+def send_message_to_user(telegram_id: int, message: str):
+    bot.send_message(telegram_id, message)
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_callback(call):
@@ -286,7 +293,7 @@ def run_bot():
     try:
         set_commands_for_lang("ru")  # Başlangıç dili, dinamik olarak da belirlenebilir
         bot.remove_webhook()
-        bot.polling(none_stop=True, interval=0, timeout=120)
+        bot.polling(none_stop=True, interval=0, timeout=3600)
     except Exception as e:
         print("Bot polling xətası:", e)
         traceback.print_exc()

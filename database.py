@@ -47,12 +47,26 @@ class Database:
         self.cursor.execute('SELECT * FROM users WHERE telegram_id = ?', (telegram_id,))
         return self.cursor.fetchone()
 
-    def update_vpn_status(self, telegram_id, vpn_server, vpn_id, vpn_status):
+    def update_vpn_status(self, telegram_id, vpn_server, vpn_id):
         self.cursor.execute('''
-            UPDATE users SET vpn_status = ?,vpn_server = ?,vpn_id = ?, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?
-        ''', (vpn_status, vpn_server, vpn_id, telegram_id))
+            UPDATE users SET vpn_server = ?,vpn_id = ?, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?
+        ''', (vpn_server, vpn_id, telegram_id))
         self.connection.commit()
    
+    def update_vpn_access(self, vpn_status, telegram_id):
+        try:
+            print(telegram_id, vpn_status)
+            
+            self.cursor.execute(
+                'UPDATE users SET vpn_status = ?, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?',
+                (vpn_status, telegram_id)
+            )
+            self.connection.commit()
+        except Exception as e:
+            # Hatanın kaydedilmesi veya loglanması
+            print(f"VPN güncelleme hatası: {e}")
+            # Gerekirse yeniden fırlatın veya False döndürün
+            raise
 
     def delete_user(self, telegram_id):
         self.cursor.execute('DELETE FROM users WHERE telegram_id = ?', (telegram_id,))
@@ -64,9 +78,13 @@ class Database:
         return result[0] == 1 if result else False
     
     def is_vpn_active(self, telegram_id):
-        self.cursor.execute('SELECT vpn_status FROM users WHERE telegram_id = ?', (telegram_id,))
+        self.cursor.execute(
+            'SELECT vpn_status FROM users WHERE telegram_id = ?', 
+            (telegram_id,)
+        )
         result = self.cursor.fetchone()
-        return result[0] == 1 if result else False
+        # result None ise False, değilse result[0] == 1 döner
+        return bool(result and result[0] == 1)
 
     def close(self):
         self.connection.close()

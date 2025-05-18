@@ -8,11 +8,11 @@ def run_uvicorn():
 
 if __name__ == "__main__":
     # Thread ile bot ve uvicorn'u başlat
-    bot_thread = threading.Thread(target=bot.run_bot)
-    uvicorn_thread = threading.Thread(target=run_uvicorn)
+    bot_thread = threading.Thread(target=bot.run_bot, daemon=True)
+    uvicorn_thread = threading.Thread(target=run_uvicorn,  daemon=True)
 
-    bot_thread.start()
     uvicorn_thread.start()
+    bot_thread.start()
 
     bot_thread.join()
     uvicorn_thread.join()
