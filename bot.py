@@ -21,7 +21,8 @@ seperator = setting["seperator"]
 pay_message_ids = []
 public_url = start_telebit()
 default_user_id = 0
-
+lang_code = "en"
+web_app_lang = ""
 
 # Dil kodunu almaq üçün köməkçi funksiya
 def get_lang_code(message):
@@ -81,8 +82,10 @@ def get_tg_data(user):
 # /start əmri - istifadəçini qeydiyyata alır və salamlayır
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
+    global web_app_lang
     try:
         lang_code = get_lang_code(message)
+        web_app_lang = lang_code
         user_id = str(message.from_user.id)
         admin_status = 1 if user_id in admin_id else 0  # Admin olub olmadığını yoxlayırıq
         tg_data = get_tg_data(message.from_user)
@@ -95,6 +98,7 @@ def send_welcome(message):
                 surname=tg_data["last_name"],
                 tg_username=tg_data["username"],
                 telegram_id=tg_data["user_id"],
+                user_language=lang_code,
                 vpn_id=None,
                 vpn_status=0,
                 vpn_server=None,
@@ -191,46 +195,35 @@ def send_help(message):
         traceback.print_exc()
         bot.reply_to(message, lang[lang_code]['errors']["error_bot"])
 
-
-# /help əmri - mövcud komandaları izah edir
-@bot.message_handler(commands=['test'])
-def test(message):
-    lang_code = get_lang_code(message)
-    try:
-        print(lang_code)
-        bot.reply_to(message, "Ugurlu oldu")
-    except:
-        print("Xəta /help:", e)
-        traceback.print_exc()
-
-def send_web_app(messsage_two):
-    lang_code = get_lang_code(messsage_two)
+def send_web_app(messsage_two, lang_code_func):
+    print(lang_code_func)
     user_status = db.is_vpn_active(messsage_two.from_user.id)
+    # lang_code = get_lang_code(messsage_two)
 
     if user_status == 1:
-        bot.send_message(messsage_two.chat.id, lang[lang_code]["vpn_already_exists"])
+        bot.send_message(messsage_two.chat.id, lang[lang_code_func]["vpn_already_exists"])
         return
 
     # VPN aktif değilse ödeme sayfası Web App butonunu gönder
     markup = InlineKeyboardMarkup()
     web_app_url = (
         f"{public_url}/pay"
-        f"?amount=250.0"
-        f"&currency=RUB"
-        f"&description={quote(lang[lang_code]['payment']['description'])}"
+        f"?amount={lang[lang_code_func]["price_settings"]["price"]}"
+        f"&currency={lang[lang_code_func]["price_settings"]["currency"]}"
+        f"&description={quote(lang[lang_code_func]['payment']['description'])}"
         f"&accountId={messsage_two.from_user.id}"
         f"&invoiceId=inv_{messsage_two.from_user.id}"
         f"&tg_id={default_user_id}"
-        f"&lang={lang_code}"
+        f"&lang={lang_code_func}"
     )
     web_app = WebAppInfo(url=web_app_url)
     if(db.is_vpn_active(messsage_two.from_user.id) == 1):
-        bot.send_message(messsage_two.chat.id, lang[lang_code]["vpn_already_exists"])
+        bot.send_message(messsage_two.chat.id, lang[lang_code_func]["vpn_already_exists"])
         return
-    markup.add(InlineKeyboardButton(lang[lang_code]["payment"]["button"], web_app=web_app))
+    markup.add(InlineKeyboardButton(lang[lang_code_func]["payment"]["button"], web_app=web_app))
     pay_message_ids.append(bot.send_message(
         messsage_two.chat.id,
-        lang[lang_code]["payment"]["description"],
+        lang[lang_code_func]["payment"]["description"],
         reply_markup=markup
     ))
 
@@ -251,10 +244,10 @@ def send_message_to_user(telegram_id: int, message: str):
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_callback(call):
-    lang_code = get_lang_code(call.message)  # Dil ayarı
     try:
         if call.data == "buy":
-           send_web_app(call.message)
+           db.get_user_language(telegram_id=default_user_id)
+           send_web_app(call.message, web_app_lang)
            
         elif call.data == "renew":
             bot.answer_callback_query(call.id, "Ödeme yenileniyor...")

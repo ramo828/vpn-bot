@@ -48,7 +48,7 @@ async def payment_page(
     return HTMLResponse(get_html(
         amount=amount,
         currency=currency,
-        description=description,
+        description=lng[default_language]["payment"]["description"],
         accountId=accountId,
         invoiceId=invoiceId,
         skin=skin,

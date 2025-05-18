@@ -2,6 +2,10 @@ lang = dict()
 
 # Azərbaycan dili
 lang["az"] = {
+    "price_settings" : {
+        "price": 10,
+        "currency" : "AZN"
+    },
     "ext": {
         "active": "Aktiv",
         "inactive": "Passiv",
@@ -69,6 +73,10 @@ lang["az"] = {
 
 # Türkçe
 lang["tr"] = {
+     "price_settings" : {
+        "price": 170,
+        "currency" : "TRY"
+    },
     "ext": {
         "active": "Aktiv",
         "inactive": "Pasiv",
@@ -136,6 +144,10 @@ lang["tr"] = {
 
 # Русский
 lang["ru"] = {
+     "price_settings" : {
+        "price": 250,
+        "currency" : "RUB"
+    },
     "ext": {
         "active": "Активный",
         "inactive": "Пассивный",
@@ -204,6 +216,10 @@ lang["ru"] = {
 
 # English
 lang["en"] = {
+     "price_settings" : {
+        "price": 5,
+        "currency" : "USD"
+    },
     "ext": {
         "active": "Active",
         "inactive": "Inactive",

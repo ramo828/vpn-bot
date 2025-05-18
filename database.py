@@ -19,21 +19,22 @@ class Database:
                 vpn_server TEXT,
                 vpn_id TEXT UNIQUE,
                 vpn_status INTEGER DEFAULT 0,
+                language TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
         self.connection.commit()
 
-    def insert_user(self, name, surname, tg_username, telegram_id, vpn_server, vpn_id=None, vpn_status=0, is_admin=0):
+    def insert_user(self, name, surname, tg_username, telegram_id, vpn_server, user_language, vpn_id=None, vpn_status=0, is_admin=0):
         try:
             if not tg_username:  # Eğer tg_username boşsa, None gönder
                 tg_username = None
             
             self.cursor.execute('''
-                INSERT INTO users (name, surname, tg_username, telegram_id, vpn_server, vpn_id, vpn_status, is_admin)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (name, surname, tg_username, telegram_id, vpn_server, vpn_id, vpn_status, is_admin))
+                INSERT INTO users (name, surname, tg_username, telegram_id, vpn_server, vpn_id, vpn_status, language, is_admin)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (name, surname, tg_username, telegram_id, vpn_server, vpn_id, vpn_status, user_language, is_admin))
             self.connection.commit()
         except sqlite3.IntegrityError as e:
             print(f"Error inserting user: {e}")
@@ -85,6 +86,11 @@ class Database:
         result = self.cursor.fetchone()
         # result None ise False, değilse result[0] == 1 döner
         return bool(result and result[0] == 1)
-
+    
+    def get_user_language(self, telegram_id):
+        self.cursor.execute('SELECT language FROM users WHERE telegram_id = ?', (telegram_id,))
+        result = self.cursor.fetchone()
+        return result[0] if result else None
+    
     def close(self):
         self.connection.close()
