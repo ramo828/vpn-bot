@@ -4,6 +4,7 @@ from settings.lang import lang
 from settings.setting import setting
 from utility.util import get_lang_code, get_tg_data
 from urllib.parse import quote
+from vpn_api import VPN         # VPN açarı yaratmaq üçün modul
 import traceback
 
 class BotHandler:
@@ -14,7 +15,91 @@ class BotHandler:
         self.admin_ids = setting["ADMIN_ID"]
         self.default_user_id = 0
         self.pay_message_ids = []
-        
+        self.seperator = setting["seperator"]
+        self.vpn = VPN()
+    
+    def send_help(self, message):
+        lang_code = get_lang_code(message)
+        try:
+            self.bot.reply_to(message, lang[lang_code]['help_message'])
+        except Exception as e:
+            print("Hata /help:", e)
+            traceback.print_exc()
+            self.bot.reply_to(message, lang[lang_code]['errors']["error_bot"])
+
+
+    def create(self, message):
+        lang_code = self.db.get_user_language(message.from_user.id)
+        if not lang_code:
+            self.bot.reply_to(message, lang[get_lang_code(message)]["errors"]["user_not_found"])
+            return
+        try:
+            data = self.db.get_user_by_telegram_id(message.from_user.id)
+
+            # Əgər istifadəçi bazada tapılmayıbsa
+            if not data:
+                self.bot.reply_to(message, lang[lang_code]['errors']["user_not_found"])
+                return
+
+            if data[8] == 1 :  # Əgər istifadəçi aktivdirsə
+                if data[6] is None:  # Əgər VPN hələ yaradılmayıbsa
+                    # Eğer gelen first_name boşsa, user_id'yi kullan
+                    if not get_tg_data(message.from_user)["first_name"]:
+                        self.vpn.json_data = {"name": get_tg_data(message.from_user)["user_id"]}  # Boş ise user_id'yi al
+                    else:
+                        self.vpn.json_data = {"name": get_tg_data(message.from_user)["first_name"]}  # Aksi takdirde first_name kullanılır
+                    vpn_data = self.vpn.create_key()  # VPN açarı yaradılır
+
+                    # Verilənlər bazasında istifadəçinin VPN məlumatlarını yeniləyirik
+                    self.db.update_vpn_status(
+                        telegram_id=message.from_user.id,
+                        vpn_server=vpn_data.get("accessUrl"),
+                        vpn_id=vpn_data.get("id")
+                    )
+                    self.bot.reply_to(message, lang[lang_code]["vpn_created"]+"✅\n\n" + str(vpn_data))
+                else:
+                    # Əgər artıq VPN varsa, məlumatları göstəririk
+                    self.bot.reply_to(
+                        message,
+                        f"Zatən sizin VPN var \n{self.seperator}\nID: {data[7]}\n{self.seperator}\nSERVER: {data[6]}"
+                    )
+            else:
+                # Aktiv olmayan istifadəçiyə ödəniş mesajı göndərilir
+                self.bot.reply_to(message,  lang[lang_code]["errors"]["payment_error"])
+
+        except Exception as e:
+            print("Xəta /create:", e)
+            traceback.print_exc()
+            self.bot.reply_to(message, lang[lang_code]['vpn_error'])  # Xəta mesajı göndərilir
+
+    def info(self, message):
+        lang_code = get_lang_code(message)
+
+        try:
+            data = self.db.get_user_by_telegram_id(message.from_user.id)
+            if data:
+                user_info = f"""
+    {self.seperator}
+            {lang[lang_code]["tg_user_data"]["last_name"]}: {data[1]}
+            {lang[lang_code]["tg_user_data"]["first_name"]}: {data[2]}
+            {lang[lang_code]["tg_user_data"]["username"]}: {data[3]}
+            {lang[lang_code]["tg_user_data"]["tg_id"]}: {data[5]}
+            {lang[lang_code]["vpn_data"]["vpn_server"]}: {data[6]}
+            {lang[lang_code]["vpn_data"]["vpn_id"]}: {data[7]}
+            {lang[lang_code]["vpn_data"]["vpn_status"]}: {'Aktiv ✅' if data[8] == 1 else 'Passiv ❌'}
+            {lang[lang_code]["vpn_data"]["create_date"]}: {data[9]}
+            {lang[lang_code]["vpn_data"]["update_date"]}: {data[10]}
+    {self.seperator}
+                """
+            else:
+                user_info = lang[lang_code]['errors']["user_not_found"]
+
+            self.bot.reply_to(message, user_info)
+        except Exception as e:
+            print("Hata /user_info:", e)
+            traceback.print_exc()
+            self.bot.reply_to(message, lang[lang_code]["errors"]["user_not_found"])  # Xəta mesajı göndərilir
+
     def clear_messages(self):
         for message in self.pay_message_ids:
             try:

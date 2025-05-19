@@ -53,7 +53,6 @@ lang["az"] = {
     "start_message": "Salam! VPN yaratmaq üçün /create əmri yazın.",
     "vpn_created": "VPN açarı yaradıldı",
     "vpn_error": "VPN yaratmaqda xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin.",
-    "user_not_found": "İstifadəçi tapılmadı. Əvvəlcə /start yazın.",
     "vpn_already_exists": "VPN artıq yaradılıb. Yenidən yaratmaq üçün /delete əmri yazın.",
     "vpn_deleted": "VPN açarı silindi.",
     "error_bot": "Botda xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin.",
@@ -68,6 +67,7 @@ lang["az"] = {
         "error_bot": "Botda xəta baş verdi.",
         "polling_error": "Polling zamanı xəta baş verdi.",
         "payment_error": "Ödəniş zamanı xəta baş verdi.",
+        "user_not_found": "İstifadəçi tapılmadı. Zəhmət olmasa /start yazın.",
     },
 }
 
@@ -124,7 +124,6 @@ lang["tr"] = {
     "start_message": "Merhaba! VPN oluşturmak için /create komutunu yazın.",
     "vpn_created": "VPN anahtarı oluşturuldu",
     "vpn_error": "VPN oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
-    "user_not_found": "Kullanıcı bulunamadı. Önce /start komutunu girin.",
     "vpn_already_exists": "VPN zaten oluşturulmuş. Yeniden oluşturmak için /delete komutunu girin.",
     "vpn_deleted": "VPN anahtarı silindi.",
     "error_bot": "Botta bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
@@ -139,6 +138,7 @@ lang["tr"] = {
         "error_bot": "Botta hata oluştu.",
         "polling_error": "Polling sırasında hata oluştu.",
         "payment_error": "Ödeme sırasında hata oluştu.",
+        "user_not_found": "Kullanıcı bulunamadı. Lütfen /start yazın.",
     },
 }
 
@@ -195,7 +195,6 @@ lang["ru"] = {
     "start_message": "Привет! Чтобы создать VPN, используйте команду /create.",
     "vpn_created": "VPN ключ успешно создан",
     "vpn_error": "Ошибка при создании VPN. Пожалуйста, попробуйте позже.",
-    "user_not_found": "Пользователь не найден. Сначала введите /start.",
     "vpn_already_exists": "VPN уже создан. Чтобы создать заново, используйте /delete.",
     "vpn_deleted": "VPN ключ удалён.",
     "error_bot": "Произошла ошибка в боте. Пожалуйста, попробуйте позже.",
@@ -210,6 +209,7 @@ lang["ru"] = {
         "error_bot": "Ошибка в боте.",
         "polling_error": "Ошибка во время polling.",
         "payment_error": "Ошибка во время оплаты.",
+        "user_not_found": "Пользователь не найден. Пожалуйста, введите /start.",
     },
 
 }
@@ -267,4 +267,20 @@ lang["en"] = {
     "start_message": "Hello! To create a VPN, type /create.",
     "vpn_created": "VPN key has been created",
     "vpn_error": "An error occurred while creating the VPN. Please try again later.",
+    "vpn_already_exists": "VPN already exists. To recreate, use the /delete command.",
+    "vpn_deleted": "VPN key has been deleted.",
+    "error_bot": "An error occurred in the bot. Please try again later.",
+    "help_message": """
+/start - Start the bot and register the user.
+/help - Show the list of available commands.
+/create - Create a new VPN account (for active users).
+/user_info - Show user information.
+""",
+    "errors": {
+        "vpn_error": "Error creating VPN.",
+        "error_bot": "Error in bot.",
+        "polling_error": "Error during polling.",
+        "payment_error": "Error during payment.",
+        "user_not_found": "User not found. Please enter /start.",
+    },
 }

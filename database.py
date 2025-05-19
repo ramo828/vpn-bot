@@ -2,106 +2,135 @@ import sqlite3
 
 class Database:
     def __init__(self, db_name=':memory:'):
-        # Verilənlər bazasına bağlantı yaradılır
+        # Veritabanına bağlantı oluşturulur; aynı thread içinde sqlite izni var
         self.connection = sqlite3.connect(db_name, check_same_thread=False)
-        self.cursor = self.connection.cursor()
-        self.create_table()  # Tablo yoxdursa yaradılır
+        self.create_table()  # Eğer tablo yoksa oluştur
 
     def create_table(self):
-        # Əgər 'users' cədvəli yoxdursa, yaradılır
-        self.cursor.execute('''
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                surname TEXT,
-                tg_username TEXT,
-                is_admin INTEGER DEFAULT 0,
-                telegram_id TEXT NOT NULL UNIQUE,
-                vpn_server TEXT,
-                vpn_id TEXT UNIQUE,
-                vpn_status INTEGER DEFAULT 0,
-                language TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        self.connection.commit()
+        # 'users' tablosunu yaratır
+        with self.connection:
+            cur = self.connection.cursor()
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    surname TEXT,
+                    tg_username TEXT,
+                    is_admin INTEGER DEFAULT 0,
+                    telegram_id TEXT NOT NULL UNIQUE,
+                    vpn_server TEXT,
+                    vpn_id TEXT UNIQUE,
+                    vpn_status INTEGER DEFAULT 0,
+                    language TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
 
-    def insert_user(self, name, surname, tg_username, telegram_id, vpn_server, user_language, vpn_id=None, vpn_status=0, is_admin=0):
-        # Yeni istifadəçi əlavə etmək üçün metod
+    def insert_user(self, name, surname, tg_username, telegram_id,
+                    vpn_server, user_language, vpn_id=None,
+                    vpn_status=0, is_admin=0):
+        # Yeni kullanıcı ekler
         try:
-            if not tg_username:
-                tg_username = None  # Boşdursa, None təyin et
-
-            self.cursor.execute('''
-                INSERT INTO users (name, surname, tg_username, telegram_id, vpn_server, vpn_id, vpn_status, language, is_admin)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (name, surname, tg_username, telegram_id, vpn_server, vpn_id, vpn_status, user_language, is_admin))
-            self.connection.commit()
+            with self.connection:
+                cur = self.connection.cursor()
+                cur.execute('''
+                    INSERT INTO users
+                        (name, surname, tg_username, telegram_id,
+                         vpn_server, vpn_id, vpn_status, language, is_admin)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (name, surname or None, tg_username or None,
+                      telegram_id, vpn_server, vpn_id,
+                      vpn_status, user_language, is_admin))
         except sqlite3.IntegrityError as e:
             print(f"İstifadəçi əlavə edilərkən xəta: {e}")
 
     def fetch_users(self):
-        # Bütün istifadəçiləri qaytarır
-        self.cursor.execute('SELECT * FROM users')
-        return self.cursor.fetchall()
+        # Tüm kullanıcıları döner
+        cur = self.connection.cursor()
+        cur.execute('SELECT * FROM users')
+        return cur.fetchall()
+
     def get_user_by_telegram_id(self, telegram_id):
-        with self.connection:
-            cursor = self.connection.cursor()
-            cursor.execute('SELECT * FROM users WHERE telegram_id = ?', (telegram_id,))
-            return cursor.fetchone()
+        # Telegram ID'ye göre tek kullanıcı
+        cur = self.connection.cursor()
+        cur.execute(
+            'SELECT * FROM users WHERE telegram_id = ?',
+            (telegram_id,)
+        )
+        return cur.fetchone()
 
     def update_vpn_status(self, telegram_id, vpn_server, vpn_id):
-        # VPN status və server məlumatını yeniləyir
-        self.cursor.execute('''
-            UPDATE users SET vpn_server = ?, vpn_id = ?, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?
-        ''', (vpn_server, vpn_id, telegram_id))
-        self.connection.commit()
+        # VPN server ve ID bilgisini günceller
+        with self.connection:
+            cur = self.connection.cursor()
+            cur.execute('''
+                UPDATE users
+                   SET vpn_server = ?, vpn_id = ?, updated_at = CURRENT_TIMESTAMP
+                 WHERE telegram_id = ?
+            ''', (vpn_server, vpn_id, telegram_id))
 
     def update_vpn_access(self, vpn_status, telegram_id):
-        # VPN aktivlik vəziyyətini dəyişir
+        # VPN erişim (aktif/pasif) durumunu günceller
         try:
-            print(telegram_id, vpn_status)
-            self.cursor.execute(
-                'UPDATE users SET vpn_status = ?, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?',
-                (vpn_status, telegram_id)
-            )
-            self.connection.commit()
+            with self.connection:
+                cur = self.connection.cursor()
+                cur.execute(
+                    'UPDATE users SET vpn_status = ?, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?',
+                    (vpn_status, telegram_id)
+                )
         except Exception as e:
             print(f"VPN status yenilənərkən xəta: {e}")
             raise
 
     def delete_user(self, telegram_id):
-        # İstifadəçini silmək üçün metod
-        self.cursor.execute('DELETE FROM users WHERE telegram_id = ?', (telegram_id,))
-        self.connection.commit()
+        # Kullanıcıyı siler
+        with self.connection:
+            cur = self.connection.cursor()
+            cur.execute(
+                'DELETE FROM users WHERE telegram_id = ?',
+                (telegram_id,)
+            )
 
     def is_admin(self, telegram_id):
-        # İstifadəçi admin olub-olmadığını yoxlayır
-        self.cursor.execute('SELECT is_admin FROM users WHERE telegram_id = ?', (telegram_id,))
-        result = self.cursor.fetchone()
-        return result[0] == 1 if result else False
-
-    def is_vpn_active(self, telegram_id):
-        # VPN statusunun aktiv olub olmadığını yoxlayır
-        self.cursor.execute(
-            'SELECT vpn_status FROM users WHERE telegram_id = ?', 
+        # Kullanıcının admin olup olmadığını döner
+        cur = self.connection.cursor()
+        cur.execute(
+            'SELECT is_admin FROM users WHERE telegram_id = ?',
             (telegram_id,)
         )
-        result = self.cursor.fetchone()
-        return bool(result and result[0] == 1)
+        row = cur.fetchone()
+        return bool(row and row[0] == 1)
+
+    def is_vpn_active(self, telegram_id):
+        # VPN durumunu döner
+        cur = self.connection.cursor()
+        cur.execute(
+            'SELECT vpn_status FROM users WHERE telegram_id = ?',
+            (telegram_id,)
+        )
+        row = cur.fetchone()
+        return bool(row and row[0] == 1)
 
     def get_user_language(self, telegram_id):
-        # İstifadəçinin seçdiyi dili alır
-        self.cursor.execute('SELECT language FROM users WHERE telegram_id = ?', (telegram_id,))
-        result = self.cursor.fetchone()
-        return result[0] if result else None
+        # Kullanıcı dil ayarını döner
+        cur = self.connection.cursor()
+        cur.execute(
+            'SELECT language FROM users WHERE telegram_id = ?',
+            (telegram_id,)
+        )
+        row = cur.fetchone()
+        return row[0] if row else None
 
     def set_user_language(self, telegram_id, lang_code="en"):
-        # İstifadəçinin dilini təyin edir
-        self.cursor.execute('UPDATE users SET language = ? WHERE telegram_id = ?', (lang_code, telegram_id))
-        self.connection.commit()
+        # Kullanıcı dil ayarını günceller
+        with self.connection:
+            cur = self.connection.cursor()
+            cur.execute(
+                'UPDATE users SET language = ?, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?',
+                (lang_code, telegram_id)
+            )
 
     def close(self):
-        # Verilənlər bazasını bağlayır
+        # Veritabanı bağlantısını kapatır
         self.connection.close()

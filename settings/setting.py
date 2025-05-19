@@ -28,5 +28,5 @@ setting['pay_server_port'] = "8080"
 # Bot serverinin istifadə etdiyi port nömrəsi
 setting['bot_server_port'] = "15413"
 
-# Bulud (cloud) ödəniş sistemi API açarı — bu, xarici xidmətlərlə əlaqə qurmaq üçün istifadə oluna bilər
+# Bulud (cloud) API açarı — bu, xarici xidmətlərlə əlaqə qurmaq üçün istifadə oluna bilər
 setting['cloud_api'] = "test_api_00000000000000000000001"
