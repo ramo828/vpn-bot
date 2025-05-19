@@ -7,109 +7,36 @@ from settings.lang import lang
 from settings.setting import setting
 import urllib3
 from urllib.parse import quote
-import json
-from utility.util import start_telebit
+from bot_functions.functions import BotHandler
+from utility.util import start_telebit, get_lang_code, get_tg_data
+
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # Botun TOKEN açarı (Telegramdan əldə edilir)
 
+public_url = start_telebit()
 bot = telebot.TeleBot(setting["TOKEN"])
+handler = BotHandler(bot, public_url=public_url)
+
+pay_message_ids = []
 
 # Admin hesablarının Telegram ID-ləri (sətir tipində saxlanılır)
 admin_id = setting["ADMIN_ID"]
 # Dekorativ xətt (mesajları daha oxunaqlı etmək üçün)
 seperator = setting["seperator"]
-pay_message_ids = []
-public_url = start_telebit()
-default_user_id = 0
 lang_code = "en"
-web_app_lang = ""
 
-# Dil kodunu almaq üçün köməkçi funksiya
-def get_lang_code(message):
-    code = message.from_user.language_code or "en"
-    return code if code in lang else "en"
-
-# Komutları ve buton metinlerini dil dosyasından yükle
-def set_commands_for_lang(lang_code="az"):
-    try:
-        command_texts = lang[lang_code]["commands"]
-        button_texts = lang[lang_code]["buttons"]  # Dil dosyanıza "buttons" ekleyin
-        
-        # Bot komutlarını ayarla
-        commands = [
-            BotCommand("start", command_texts["start"]),
-            BotCommand("help", command_texts["help"]),
-            BotCommand("create", command_texts["create"]),
-            BotCommand("user_info", command_texts["user_info"]),
-            BotCommand("test", "test"),
-
-        ]
-        bot.set_my_commands(commands)
-        
-        # Butonları oluştur (örnek olarak /start mesajına ekleyeceğiz)
-        return InlineKeyboardMarkup(row_width=2).add(
-            InlineKeyboardButton(button_texts["connect"], callback_data="buy"),
-            InlineKeyboardButton(button_texts["renew"], callback_data="renew"),
-            InlineKeyboardButton(button_texts["active_keys"], callback_data="active_keys"),
-            InlineKeyboardButton(button_texts["change_protocol"], callback_data="change_protocol"),
-            InlineKeyboardButton(button_texts["change_country"], callback_data="change_country"),
-            InlineKeyboardButton(button_texts["router_tv"], callback_data="router_tv"),
-            InlineKeyboardButton(button_texts["invite"], callback_data="invite"),
-            InlineKeyboardButton(button_texts["partnership"], callback_data="partnership"),
-        )
-        
-    except Exception as e:
-        print("Komut ve buton ayarlama hatası:", e)
-        return None
 
 
 # Verilənlər bazası və VPN obyektlərini yaradırıq
 db = Database(setting["db_filename"])
 vpn = VPN()
 
-# Telegram istifadəçisindən alınan məlumatları strukturlaşdırırıq
-def get_tg_data(user):
-    global default_user_id
-    default_user_id = user.id
-    return {
-        'first_name': user.first_name,
-        'last_name': user.last_name,
-        'username': user.username,
-        'user_id': str(user.id),
-        'language_code': user.language_code,
-    }
 
 # /start əmri - istifadəçini qeydiyyata alır və salamlayır
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    global web_app_lang
-    try:
-        lang_code = get_lang_code(message)
-        web_app_lang = lang_code
-        user_id = str(message.from_user.id)
-        admin_status = 1 if user_id in admin_id else 0  # Admin olub olmadığını yoxlayırıq
-        tg_data = get_tg_data(message.from_user)
-
-        # Əgər istifadəçi artıq mövcuddursa, qeydiyyat etmə
-        existing = db.get_user_by_telegram_id(user_id)
-        if not existing:
-            db.insert_user(
-                name=tg_data["first_name"],
-                surname=tg_data["last_name"],
-                tg_username=tg_data["username"],
-                telegram_id=tg_data["user_id"],
-                user_language=lang_code,
-                vpn_id=None,
-                vpn_status=0,
-                vpn_server=None,
-                is_admin=admin_status
-            )
-        keyboard = set_commands_for_lang(lang_code)  # Hem komutları hem butonları ayarlar
-        bot.reply_to(message, lang[lang_code]['start_message'],reply_markup=keyboard)
-    except Exception as e:
-        print("Hata /start:", e)
-        traceback.print_exc()
-        bot.reply_to(message, lang[lang_code]['error_bot'])  # Xəta mesajı göndərilir
+    handler.handle_start(message)
 
 # /create əmri - VPN yaratmaq üçün istifadə olunur
 @bot.message_handler(commands=['create'])
@@ -195,45 +122,9 @@ def send_help(message):
         traceback.print_exc()
         bot.reply_to(message, lang[lang_code]['errors']["error_bot"])
 
-def send_web_app(messsage_two, lang_code_func):
-    print(lang_code_func)
-    user_status = db.is_vpn_active(messsage_two.from_user.id)
-    # lang_code = get_lang_code(messsage_two)
-
-    if user_status == 1:
-        bot.send_message(messsage_two.chat.id, lang[lang_code_func]["vpn_already_exists"])
-        return
-
-    # VPN aktif değilse ödeme sayfası Web App butonunu gönder
-    markup = InlineKeyboardMarkup()
-    web_app_url = (
-        f"{public_url}/pay"
-        f"?amount={lang[lang_code_func]["price_settings"]["price"]}"
-        f"&currency={lang[lang_code_func]["price_settings"]["currency"]}"
-        f"&description={quote(lang[lang_code_func]['payment']['description'])}"
-        f"&accountId={messsage_two.from_user.id}"
-        f"&invoiceId=inv_{messsage_two.from_user.id}"
-        f"&tg_id={default_user_id}"
-        f"&lang={lang_code_func}"
-    )
-    web_app = WebAppInfo(url=web_app_url)
-    if(db.is_vpn_active(messsage_two.from_user.id) == 1):
-        bot.send_message(messsage_two.chat.id, lang[lang_code_func]["vpn_already_exists"])
-        return
-    markup.add(InlineKeyboardButton(lang[lang_code_func]["payment"]["button"], web_app=web_app))
-    pay_message_ids.append(bot.send_message(
-        messsage_two.chat.id,
-        lang[lang_code_func]["payment"]["description"],
-        reply_markup=markup
-    ))
-
 def clear_pay_message():
-    for message in pay_message_ids:
-        try:
-            bot.delete_message(message.chat.id, message.message_id)
-        except Exception as e:
-            print("Xəta mesaj silinərkən:", e)
-    pay_message_ids.clear()
+    handler.clear_messages()
+
 
 def send_message_to_admin(message):
     admin_chat_id = int(setting["ADMIN_ID"][2])  # Admin'in Telegram chat ID'sini buraya yazın
@@ -244,57 +135,16 @@ def send_message_to_user(telegram_id: int, message: str):
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_callback(call):
-    try:
-        if call.data == "buy":
-           db.get_user_language(telegram_id=default_user_id)
-           send_web_app(call.message, web_app_lang)
-           
-        elif call.data == "renew":
-            bot.answer_callback_query(call.id, "Ödeme yenileniyor...")
-            # Ödeme işlemleri burada
-            # renew_subscription(call.from_user.id)  # Kendi fonksiyonunuzu yazın
+    handler.handle_callback(call)
 
-        elif call.data == "active_keys":
-            # Aktif anahtarları veritabanından çek
-            user_data = db.get_user_by_telegram_id(call.from_user.id)
-            if user_data and user_data[6]:  # VPN sunucusu varsa
-                bot.send_message(call.message.chat.id, f"🔑 Aktif anahtarınız: `{user_data[6]}`", parse_mode="Markdown")
-            else:
-                bot.send_message(call.message.chat.id, "❌ Aktif anahtar bulunamadı!")
-
-        elif call.data == "change_protocol":
-            # Protokol seçim butonlarını göster
-            protocols_keyboard = InlineKeyboardMarkup(row_width=2)
-            protocols_keyboard.add(
-                InlineKeyboardButton("WireGuard", callback_data="protocol_wg"),
-                InlineKeyboardButton("OpenVPN", callback_data="protocol_ovpn"),
-                InlineKeyboardButton("İptal", callback_data="cancel")
-            )
-            bot.send_message(call.message.chat.id, "Lütfen bir protokol seçin:", reply_markup=protocols_keyboard)
-
-        # Protokol seçim butonları
-        elif call.data == "protocol_wg":
-            # db.update_protocol(call.message.chat.id, "WireGuard")
-            bot.send_message(call.message.chat.id, "✅ Protokol WireGuard olarak ayarlandı!")
-        
-        elif call.data == "protocol_ovpn":
-            # db.update_protocol(call.message.chat.id, "OpenVPN")
-            bot.send_message(call.message.chat.id, "✅ Protokol OpenVPN olarak ayarlandı!")
-        
-        elif call.data == "cancel":
-            bot.delete_message(call.message.chat.id, call.message.message_id)  # Mesajı sil
-            bot.send_message(call.message.chat.id, "❌ İşlem iptal edildi.")
-        
-    except Exception as e:
-        print("Callback hatası:", e)
-        bot.answer_callback_query(call.id, "❌ İşlem sırasında hata oluştu!")
+    
 
 # Botun fasiləsiz işləməsi üçün polling başlat
 def run_bot():
     try:
-        set_commands_for_lang("ru")  # Başlangıç dili, dinamik olarak da belirlenebilir
         bot.remove_webhook()
         bot.polling(none_stop=True, interval=0, timeout=3600)
+        handler.register_commands("ru")  # Başlangıç dili, dinamik olarak da belirlenebilir
     except Exception as e:
         print("Bot polling xətası:", e)
         traceback.print_exc()

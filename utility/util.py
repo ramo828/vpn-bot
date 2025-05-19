@@ -1,4 +1,5 @@
 import subprocess
+from settings.lang import lang
 import re
 
 LANG_MAPPING = {
@@ -19,6 +20,23 @@ LANG_MAPPING = {
     'it':   'it'
 }
 
+
+# Telegram istifadəçisindən alınan məlumatları strukturlaşdırırıq
+def get_tg_data(user):
+    global default_user_id
+    default_user_id = user.id
+    return {
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'username': user.username,
+        'user_id': str(user.id),
+        'language_code': user.language_code,
+    }
+
+# Dil kodunu almaq üçün köməkçi funksiya
+def get_lang_code(message):
+    code = message.from_user.language_code or "en"
+    return code if code in lang else "en"
 
 def start_telebit():
     public_url = ""

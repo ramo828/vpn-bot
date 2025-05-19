@@ -11,7 +11,7 @@ from bot import send_message_to_admin, send_message_to_user, clear_pay_message
 import json
 
 app = FastAPI()
-db = Database("vpn_users.db")
+db = Database(setting['db_filename'])
 
 cloud_api = setting['cloud_api']
 app.add_middleware(
