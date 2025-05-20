@@ -16,17 +16,8 @@ setting['db_filename'] = "vpn_users.db"
 # Ödəniş serverinin IP ünvanı (lokal şəbəkədə yerləşir)
 setting['pay_server_url'] = "192.168.100.32"
 
-# Botun işlədiyi serverin IP ünvanı (yenə də lokal IP)
-setting['bot_server_url'] = "192.168.100.32"
-
-# Bot serverində istifadə olunan API açarı — bu, təhlükəsiz məlumat mübadiləsi üçün istifadə olunur
-setting['bot_server_api'] = ""
-
 # Ödəniş serverinin istifadə etdiyi port nömrəsi
 setting['pay_server_port'] = "8080"
 
-# Bot serverinin istifadə etdiyi port nömrəsi
-setting['bot_server_port'] = "15413"
-
 # Bulud (cloud) API açarı — bu, xarici xidmətlərlə əlaqə qurmaq üçün istifadə oluna bilər
-setting['cloud_api'] = "test_api_00000000000000000000001"
+setting['cloud_api'] = "pk_9eab017c3962be28818ee038583db"

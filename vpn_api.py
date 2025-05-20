@@ -1,10 +1,12 @@
 from requests import get, post, put, delete
-from settings.setting import setting
+from settings.countries import servers
+
 
 class VPN:
     def __init__(self, json_data= {}):
         self.json_data = json_data
-        self.api_url = f"https://{setting['bot_server_url']}:{setting['bot_server_port']}/{setting['bot_server_api']}"
+        self.country = "France"
+        self.api_url = f"https://{servers[self.country]['ip']}:{servers[self.country]['port']}/{servers[self.country]['api']}"
         self.keys = "/access-keys/"
     
     def create_key(self, key_id=-1):

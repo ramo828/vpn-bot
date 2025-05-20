@@ -3,6 +3,7 @@ from database import Database
 from settings.lang import lang
 from settings.setting import setting
 from settings.pay import payment
+from settings.countries import servers
 from utility.util import get_lang_code, get_tg_data
 from urllib.parse import quote
 from vpn_api import VPN         # VPN açarı yaratmaq üçün modul
@@ -119,7 +120,6 @@ class BotHandler:
                 BotCommand("help", command_texts["help"]),
                 BotCommand("create", command_texts["create"]),
                 BotCommand("user_info", command_texts["user_info"]),
-                BotCommand("test", "test"),
             ]
             self.bot.set_my_commands(commands)
         except Exception as e:
@@ -163,7 +163,14 @@ class BotHandler:
             lang_code = self.db.get_user_language(self.default_user_id)
 
             if call.data == "buy":
-                self.send_web_app(call.message, lang_code)
+                user_data = self.db.get_user_by_telegram_id(call.from_user.id)
+                user_vpn_status = self.db.is_vpn_active(call.from_user.id)
+                if user_vpn_status is None:
+                    self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']} {user_data[6]}", parse_mode="Markdown")
+                    return
+                else:
+                    self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['key_not_found']}")
+                    self.send_web_app(call.message, lang_code)
 
             elif call.data == "renew":
                 plan_month = self.db.get_user_plan(call.from_user.id)
@@ -177,7 +184,13 @@ class BotHandler:
                     InlineKeyboardButton(payment[lang_code]["plan_text"]["no"], callback_data="choise_plan"),
                 )
                 self.bot.send_message(call.message.chat.id, payment[lang_code]["plan_text"]["plan_info"]+" "+payment[lang_code]["plan_text"][plan_month] + " " + payment[lang_code]["plan_text"]["plan_question"], reply_markup=default_plan_keyboard)
-
+            elif call.data == "change_country":
+                self.bot.send_message(call.message.chat.id, lang[lang_code]["servers"]["info_1"])
+                countries_keyboard = InlineKeyboardMarkup(row_width=2)
+                countries_keyboard.add(
+                    InlineKeyboardButton(servers["France"]["name"], callback_data="buy"),
+                )
+                self.bot.send_message(call.message.chat.id, lang[lang_code]["servers"]["question"], reply_markup=countries_keyboard)
             elif call.data == "active_keys":
                 user_data = self.db.get_user_by_telegram_id(call.from_user.id)
                 if user_data and user_data[6]:

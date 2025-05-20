@@ -127,7 +127,7 @@ def get_html(amount, currency, plan, description, accountId, invoiceId, skin, da
                             JSON.stringify({{ status, invoiceId: '{invoiceId}' }}),
                             () => Telegram.WebApp.close()
                         );
-                       setTimeout(() => Telegram.WebApp.close(), 3500);
+                       setTimeout(() => Telegram.WebApp.close(), 5000);
                     }}
                 }});
             }});

@@ -86,6 +86,11 @@ lang["az"] = {
         "key_info": "Açar məlumatları",
         "active_key_info": "🔑 Aktiv açarınız: ",
         "key_not_found": "❌ Aktiv açar tapılmadı!"
+    },
+    "servers":{
+        "info": "Server seçimi",
+        "info_1": "Hələlik yalnızca Fransa serverini dəstəkləyirik.\n\n",
+        "question": "Hansı ölkəni seçmək istəyirsiniz?",
     }
 }
 
@@ -175,6 +180,11 @@ lang["tr"] = {
         "key_info": "Anahtar bilgileri",
         "active_key_info": "🔑 Aktif anahtarınız: ",
         "key_not_found": "❌ Aktif anahtar bulunamadı!"
+    },
+     "servers":{
+        "info": "Sunucu seçimi",
+        "info_1": "Şu anda yalnızca Fransa sunucusunu destekliyoruz.\n\n",
+        "question": "Hangi ülkeyi seçmek istersiniz?",
     }
 }
 
@@ -265,6 +275,11 @@ lang["ru"] = {
         "key_info": "Ключ информация",
         "active_key_info": "🔑 Ваш активный ключ: ",
         "key_not_found": "❌ Актив ключ не найден!"
+    },
+    "servers":{
+        "info": "Выбор сервера",
+        "info_1": "В настоящее время мы поддерживаем только сервер Франции.\n\n",
+        "question": "Какую страну вы хотите выбрать?",
     }
 }
 
@@ -354,5 +369,10 @@ lang["en"] = {
         "key_info": "Key Information",
         "active_key_info": "🔑 Your Active Key: ",
         "key_not_found": "❌ Active Key Not Found!"
+    },
+    "servers":{
+        "info": "Server selection",
+        "info_1": "Currently, we only support France server.\n\n",
+        "question": "Which country would you like to choose?",
     }
 }
