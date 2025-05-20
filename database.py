@@ -21,6 +21,7 @@ class Database:
                     vpn_server TEXT,
                     vpn_id TEXT UNIQUE,
                     vpn_status INTEGER DEFAULT 0,
+                    plan INTEGER DEFAULT 0,
                     language TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -29,7 +30,7 @@ class Database:
 
     def insert_user(self, name, surname, tg_username, telegram_id,
                     vpn_server, user_language, vpn_id=None,
-                    vpn_status=0, is_admin=0):
+                    vpn_status=0, is_admin=0, plan=0):
         # Yeni kullanıcı ekler
         try:
             with self.connection:
@@ -37,11 +38,11 @@ class Database:
                 cur.execute('''
                     INSERT INTO users
                         (name, surname, tg_username, telegram_id,
-                         vpn_server, vpn_id, vpn_status, language, is_admin)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                         vpn_server, vpn_id, vpn_status, language, is_admin, plan)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (name, surname or None, tg_username or None,
                       telegram_id, vpn_server, vpn_id,
-                      vpn_status, user_language, is_admin))
+                      vpn_status, user_language, is_admin, plan))
         except sqlite3.IntegrityError as e:
             print(f"İstifadəçi əlavə edilərkən xəta: {e}")
 
@@ -122,6 +123,16 @@ class Database:
         row = cur.fetchone()
         return row[0] if row else None
 
+    def get_user_plan(self, telegram_id):
+        # Kullanıcı planını döner
+        cur = self.connection.cursor()
+        cur.execute(
+            'SELECT plan FROM users WHERE telegram_id = ?',
+            (telegram_id,)
+        )
+        row = cur.fetchone()
+        return row[0] if row else None
+
     def set_user_language(self, telegram_id, lang_code="en"):
         # Kullanıcı dil ayarını günceller
         with self.connection:
@@ -129,6 +140,15 @@ class Database:
             cur.execute(
                 'UPDATE users SET language = ?, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?',
                 (lang_code, telegram_id)
+            )
+
+    def set_user_plan(self, telegram_id, plan):
+        # Kullanıcı planını günceller
+        with self.connection:
+            cur = self.connection.cursor()
+            cur.execute(
+                'UPDATE users SET plan = ?, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?',
+                (plan, telegram_id)
             )
 
     def close(self):

@@ -2,10 +2,7 @@ lang = dict()
 
 # Azərbaycan dili
 lang["az"] = {
-    "price_settings" : {
-        "price": 10,
-        "currency" : "AZN"
-    },
+  
     "ext": {
         "active": "Aktiv",
         "inactive": "Passiv",
@@ -49,6 +46,7 @@ lang["az"] = {
         "description": "Ödəniş təsviri",
         "amount": "Ödəniş məbləği",
         "button": "Ödə",
+        "plan_query" : "Neçə aylıq tarif istəyirsiniz?"
     },
     "start_message": "Salam! VPN yaratmaq üçün /create əmri yazın.",
     "vpn_created": "VPN açarı yaradıldı",
@@ -69,14 +67,31 @@ lang["az"] = {
         "payment_error": "Ödəniş zamanı xəta baş verdi.",
         "user_not_found": "İstifadəçi tapılmadı. Zəhmət olmasa /start yazın.",
     },
+    "protocols" : {
+        "shadow_socks": "Shadowsocks",
+        "wireguard": "WireGuard",
+        "openvpn": "OpenVPN",
+        "info": "Protokol seçimi",
+        "info_1": "Hələlik sadecə shadowsocks protokollarını dəstəkləyirik.\n\n",
+        "question": "Hansı protokolu seçmək istəyirsiniz?",
+        "question_2": "Hansı protokolu seçmək istəyirsiniz? (default: WireGuard)",
+        "cancel_message":"❌ Əməliyyat ləğv edildi."     
+    },
+    "keys": {
+        "key": "Açar",
+        "key_id": "Açar ID",
+        "key_status": "Açar statusu",
+        "key_create_date": "Açar yaradılma tarixi",
+        "key_expire_date": "Açar bitmə tarixi",
+        "key_info": "Açar məlumatları",
+        "active_key_info": "🔑 Aktiv açarınız: ",
+        "key_not_found": "❌ Aktiv açar tapılmadı!"
+    }
 }
 
 # Türkçe
 lang["tr"] = {
-     "price_settings" : {
-        "price": 170,
-        "currency" : "TRY"
-    },
+   
     "ext": {
         "active": "Aktiv",
         "inactive": "Pasiv",
@@ -120,6 +135,7 @@ lang["tr"] = {
         "description": "Ödeme açıklaması",
         "amount": "Ödeme tutarı",
         "button": "Şimdi Öde",
+        "plan_query" : "Ne kadar süreli bir plan istiyorsunuz?"
     },
     "start_message": "Merhaba! VPN oluşturmak için /create komutunu yazın.",
     "vpn_created": "VPN anahtarı oluşturuldu",
@@ -140,14 +156,31 @@ lang["tr"] = {
         "payment_error": "Ödeme sırasında hata oluştu.",
         "user_not_found": "Kullanıcı bulunamadı. Lütfen /start yazın.",
     },
+     "protocols" : {
+        "shadow_socks": "Shadowsocks",
+        "wireguard": "WireGuard",
+        "openvpn": "OpenVPN",
+        "info": "Protokol seçimi",
+        "info_1": "Şimdilik sadece shadowsocks protokollarını destekliyoruz.\n\n",
+        "question": "Hangı protokolu seçmek istersiniz?",
+        "question_2": "Hansı protokolu seçmək istəyirsiniz? (default: WireGuard)",        
+        "cancel_message":"❌ İşlem iptal edildi."     
+    },
+     "keys": {
+        "key": "Anahtar",
+        "key_id": "Anahtar ID",
+        "key_status": "Anahtar statusu",
+        "key_create_date": "Anahtar yaradılma tarihi",
+        "key_expire_date": "Anahtar bitiş tarihi",
+        "key_info": "Anahtar bilgileri",
+        "active_key_info": "🔑 Aktif anahtarınız: ",
+        "key_not_found": "❌ Aktif anahtar bulunamadı!"
+    }
 }
 
 # Русский
 lang["ru"] = {
-     "price_settings" : {
-        "price": 250,
-        "currency" : "RUB"
-    },
+   
     "ext": {
         "active": "Активный",
         "inactive": "Пассивный",
@@ -191,6 +224,8 @@ lang["ru"] = {
         "description": "Описание платежа",
         "amount": "Сумма платежа",
         "button": "Оплатить",
+        "plan_query" : "Необходимо выбрать тарифный план на сколько месяцев?"
+
     },
     "start_message": "Привет! Чтобы создать VPN, используйте команду /create.",
     "vpn_created": "VPN ключ успешно создан",
@@ -211,15 +246,31 @@ lang["ru"] = {
         "payment_error": "Ошибка во время оплаты.",
         "user_not_found": "Пользователь не найден. Пожалуйста, введите /start.",
     },
-
+ "protocols" : {
+        "shadow_socks": "Shadowsocks",
+        "wireguard": "WireGuard",
+        "openvpn": "OpenVPN",
+        "info": "Выбор протокола",
+        "info_1": "На данный момент мы поддерживаем только протоколы shadowsocks.\n\n",
+        "question": "Какой протокол вы хотите выбрать?",
+        "question_2": "Какой протокол вы хотите выбрать? (по умолчанию: WireGuard)",
+        "cancel_message":"❌ Операция отменена."
+    },
+      "keys": {
+        "key": "Ключ",
+        "key_id": "Ключ ID",
+        "key_status": "Ключ статус",
+        "key_create_date": "Ключ создание даты",
+        "key_expire_date": "Ключ истечение даты",
+        "key_info": "Ключ информация",
+        "active_key_info": "🔑 Ваш активный ключ: ",
+        "key_not_found": "❌ Актив ключ не найден!"
+    }
 }
 
 # English
 lang["en"] = {
-     "price_settings" : {
-        "price": 5,
-        "currency" : "USD"
-    },
+   
     "ext": {
         "active": "Active",
         "inactive": "Inactive",
@@ -263,6 +314,7 @@ lang["en"] = {
         "description": "Payment description",
         "amount": "Payment amount",
         "button": "Pay Now",
+        "plan_query" : "What duration plan do you want?"
     },
     "start_message": "Hello! To create a VPN, type /create.",
     "vpn_created": "VPN key has been created",
@@ -283,4 +335,24 @@ lang["en"] = {
         "payment_error": "Error during payment.",
         "user_not_found": "User not found. Please enter /start.",
     },
+     "protocols" : {
+        "shadow_socks": "Shadowsocks",
+        "wireguard": "WireGuard",
+        "openvpn": "OpenVPN",
+        "info": "Protocol selection",
+        "info_1": "Currently, we only support shadowsocks protocols.\n\n",
+        "question": "Which protocol would you like to choose?",
+        "question_2": "Which protocol would you like to choose? (default: WireGuard)",
+        "cancel_message":"❌ Operation canceled."
+    },
+      "keys": {
+        "key": "Key",
+        "key_id": "Key ID",
+        "key_status": "Key Status",
+        "key_create_date": "Key Creation Date",
+        "key_expire_date": "Key Expiration Date",
+        "key_info": "Key Information",
+        "active_key_info": "🔑 Your Active Key: ",
+        "key_not_found": "❌ Active Key Not Found!"
+    }
 }

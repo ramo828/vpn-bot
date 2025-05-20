@@ -1,10 +1,12 @@
-from telebot.types import BotCommand, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+from telebot.types import BotCommand, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo, ReplyKeyboardMarkup
 from database import Database
 from settings.lang import lang
 from settings.setting import setting
+from settings.pay import payment
 from utility.util import get_lang_code, get_tg_data
 from urllib.parse import quote
 from vpn_api import VPN         # VPN açarı yaratmaq üçün modul
+from bot_functions.buttons import get_start_buttons
 import traceback
 
 class BotHandler:
@@ -108,6 +110,7 @@ class BotHandler:
                 print("Xəta mesaj silinərkən:", e)
         self.pay_message_ids.clear()
     # Bot komutlarını qeydiyyatdan keçirt
+    
     def register_commands(self, lang_code="az"):
         try:
             command_texts = lang[lang_code]["commands"]
@@ -122,23 +125,6 @@ class BotHandler:
         except Exception as e:
             print("Komut ayarlama xətası:", e)
 
-    # Start butonlarını hazırla
-    def get_start_buttons(self, lang_code="ru"):
-        try:
-            button_texts = lang[lang_code]["buttons"]
-            return InlineKeyboardMarkup(row_width=2).add(
-                InlineKeyboardButton(button_texts["connect"], callback_data="buy"),
-                InlineKeyboardButton(button_texts["renew"], callback_data="renew"),
-                InlineKeyboardButton(button_texts["active_keys"], callback_data="active_keys"),
-                InlineKeyboardButton(button_texts["change_protocol"], callback_data="change_protocol"),
-                InlineKeyboardButton(button_texts["change_country"], callback_data="change_country"),
-                InlineKeyboardButton(button_texts["router_tv"], callback_data="router_tv"),
-                InlineKeyboardButton(button_texts["invite"], callback_data="invite"),
-                InlineKeyboardButton(button_texts["partnership"], callback_data="partnership"),
-            )
-        except Exception as e:
-            print("Buton ayarlama xətası:", e)
-            return InlineKeyboardMarkup()
 
     # /start komutuna cavab ver
     def handle_start(self, message):
@@ -164,7 +150,7 @@ class BotHandler:
                 )
 
             self.register_commands(lang_code)
-            keyboard = self.get_start_buttons(lang_code)
+            keyboard = get_start_buttons(lang_code)
             self.bot.reply_to(message, lang[lang_code]['start_message'], reply_markup=keyboard)
         except Exception as e:
             print("Xəta /start:", e)
@@ -180,49 +166,87 @@ class BotHandler:
                 self.send_web_app(call.message, lang_code)
 
             elif call.data == "renew":
-                self.bot.answer_callback_query(call.id, "Ödəniş yenilənir...")
+                plan_month = self.db.get_user_plan(call.from_user.id)
+                if(plan_month == 0):
+                    self.bot.send_message(call.message.chat.id, payment[lang_code]["plan_text"]["no_plan"])
+                    self.send_web_app(call.message, lang_code)
+                    return
+                default_plan_keyboard = InlineKeyboardMarkup(row_width=2)
+                default_plan_keyboard.add(
+                    InlineKeyboardButton(payment[lang_code]["plan_text"]["yes"], callback_data="sub_"+str(plan_month)),
+                    InlineKeyboardButton(payment[lang_code]["plan_text"]["no"], callback_data="choise_plan"),
+                )
+                self.bot.send_message(call.message.chat.id, payment[lang_code]["plan_text"]["plan_info"]+" "+payment[lang_code]["plan_text"][plan_month] + " " + payment[lang_code]["plan_text"]["plan_question"], reply_markup=default_plan_keyboard)
 
             elif call.data == "active_keys":
                 user_data = self.db.get_user_by_telegram_id(call.from_user.id)
                 if user_data and user_data[6]:
-                    self.bot.send_message(call.message.chat.id, f"🔑 Aktiv açarınız: `{user_data[6]}`", parse_mode="Markdown")
+                    self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']} {user_data[6]}", parse_mode="Markdown")
                 else:
-                    self.bot.send_message(call.message.chat.id, "❌ Aktiv açar tapılmadı!")
+                    self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['key_not_found']}")
 
             elif call.data == "change_protocol":
+                self.bot.send_message(call.message.chat.id, lang[lang_code]["protocols"]["info_1"])
                 protocols_keyboard = InlineKeyboardMarkup(row_width=2)
                 protocols_keyboard.add(
-                    InlineKeyboardButton("WireGuard", callback_data="protocol_wg"),
-                    InlineKeyboardButton("OpenVPN", callback_data="protocol_ovpn"),
-                    InlineKeyboardButton("İmtina", callback_data="cancel")
+                    InlineKeyboardButton(lang[lang_code]["protocols"]["shadow_socks"], callback_data="shadow_socks"),
                 )
-                self.bot.send_message(call.message.chat.id, "Zəhmət olmasa protokol seçin:", reply_markup=protocols_keyboard)
-
-            elif call.data == "protocol_wg":
-                self.bot.send_message(call.message.chat.id, "✅ Protokol WireGuard olaraq seçildi!")
-
-            elif call.data == "protocol_ovpn":
-                self.bot.send_message(call.message.chat.id, "✅ Protokol OpenVPN olaraq seçildi!")
-
+                self.bot.send_message(call.message.chat.id, lang[lang_code]["protocols"]["question"], reply_markup=protocols_keyboard)
             elif call.data == "cancel":
                 self.bot.delete_message(call.message.chat.id, call.message.message_id)
-                self.bot.send_message(call.message.chat.id, "❌ Əməliyyat ləğv edildi.")
-
+                self.bot.send_message(call.message.chat.id, lang[lang_code]["payment"]["cancel_message"])
+            elif call.data == "sub_1":
+                # 1 aylıq tarif üçün ödəniş prosesini başlat
+                print("1 aylıq ödəniş")
+                self.run_payment_app(call.message, lang_code, months=1)
+            elif call.data == "sub_3":
+                # 3 aylıq tarif üçün ödəniş prosesini başlat
+                print("3 aylıq ödəniş")
+                self.run_payment_app(call.message, lang_code, months=3)
+            elif call.data == "sub_6":
+                # 6 aylıq tarif üçün ödəniş prosesini başlat
+                print("6 aylıq ödəniş")
+                self.run_payment_app(call.message, lang_code, months=6)
+            elif call.data == "choise_plan":
+                self.send_web_app(call.message, lang_code)
+            else:
+                # Digər callback məlumatlarını işləyin
+                pass
         except Exception as e:
-            print("Callback xətası:", e)
-            self.bot.answer_callback_query(call.id, "❌ Əməliyyat zamanı xəta baş verdi!")
+                print("Callback xətası:", e)
+                self.bot.answer_callback_query(call.id, payment[lang_code]["plan_text"]["error"])
+
+
 
     # Ödəniş üçün Web App göndər
     def send_web_app(self, message, lang_code):
         if self.db.is_vpn_active(message.from_user.id):
             self.bot.send_message(message.chat.id, lang[lang_code]["vpn_already_exists"])
             return
-
-        markup = InlineKeyboardMarkup()
+        markup = InlineKeyboardMarkup(row_width=3)
+        markup.add(
+                InlineKeyboardButton("1 ay - "+str(payment[lang_code]["price_settings"]["one_month"]["price"]) + " " + payment[lang_code]["price_settings"]["one_month"]["currency"], callback_data="sub_1"),
+                InlineKeyboardButton("3 ay - "+str(payment[lang_code]["price_settings"]["three_months"]["price"]) + " " + payment[lang_code]["price_settings"]["three_months"]["currency"], callback_data="sub_3"),
+                InlineKeyboardButton("6 ay - "+str(payment[lang_code]["price_settings"]["six_months"]["price"]) + " " + payment[lang_code]["price_settings"]["six_months"]["currency"], callback_data="sub_6")
+            )
+        self.bot.send_message(
+                message.chat.id,
+                lang[lang_code]["payment"]["plan_query"],
+                reply_markup=markup
+            )
+     
+    def run_payment_app(self, message, lang_code, months=1):
+        markup = InlineKeyboardMarkup(row_width=2)
+        month = {
+            1: "one_month",
+            3: "three_months",
+            6: "six_months"
+        }
         web_app_url = (
             f"{self.public_url}/pay"
-            f"?amount={lang[lang_code]['price_settings']['price']}"
-            f"&currency={lang[lang_code]['price_settings']['currency']}"
+            f"?amount={str(payment[lang_code]['price_settings'][month[months]]['price'])}"
+            f"&currency={payment[lang_code]['price_settings'][month[months]]['currency']}"
+            f"&plan={months}"
             f"&description={quote(lang[lang_code]['payment']['description'])}"
             f"&accountId={message.from_user.id}"
             f"&invoiceId=inv_{message.from_user.id}"

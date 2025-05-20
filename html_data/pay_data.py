@@ -8,7 +8,7 @@ cloud_api = setting['cloud_api']
 # HTML yaradan Python funksiyası
 # Daha oxunaqlı və modern dizayn üçün dəyişənlər ayrıca təyin edildi və şərhlər Azərbaycan türkcəsindədir
 
-def get_html(amount, currency, description, accountId, invoiceId, skin, data_dict, language):
+def get_html(amount, currency, plan, description, accountId, invoiceId, skin, data_dict, language):
     # Telebit vasitəsilə əldə olunan ictimai (public) URL
     public_url = start_telebit()
 
@@ -19,6 +19,7 @@ def get_html(amount, currency, description, accountId, invoiceId, skin, data_dic
     success_msg = lng[language]['payment']['pay_success_message']
     error_msg = lng[language]['payment']['pay_error_message']
     widget_lang = LANG_MAPPING.get(language, 'en-US')
+    plan = "<1 ay>" if plan == 1 else "<3 ay>" if plan == 2 else "<6 ay>"
     data_json   = json.dumps(data_dict)    # JSON formatında əlavə məlumat
 
     # HTML şablonu
@@ -111,7 +112,7 @@ def get_html(amount, currency, description, accountId, invoiceId, skin, data_dic
                     skin: '{skin}',                // Widget görünüşü
                     data: {data_json}              // Əlavə JSON məlumat
                 }}, {{
-                    onSuccess: () => alert('{success_msg}'),  // Uğurlu ödəniş mesajı
+                    onSuccess: () => alert('{success_msg} {plan}'),  // Uğurlu ödəniş mesajı
                     onFail: () => alert('{error_msg}'),       // Uğursuz ödəniş mesajı
                     onComplete: (paymentResult) => {{
                         const status = paymentResult.success;
@@ -126,7 +127,7 @@ def get_html(amount, currency, description, accountId, invoiceId, skin, data_dic
                             JSON.stringify({{ status, invoiceId: '{invoiceId}' }}),
                             () => Telegram.WebApp.close()
                         );
-                       setTimeout(() => Telegram.WebApp.close(), 2000);
+                       setTimeout(() => Telegram.WebApp.close(), 3500);
                     }}
                 }});
             }});

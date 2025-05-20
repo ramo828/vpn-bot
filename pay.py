@@ -12,6 +12,8 @@ import json
 
 app = FastAPI()
 db = Database(setting['db_filename'])
+plan_name = ""
+plan_month = 0
 
 cloud_api = setting['cloud_api']
 app.add_middleware(
@@ -27,6 +29,7 @@ default_language = "en"
 async def payment_page(
     amount: float = Query(..., description="Payment amount"),
     currency: str = Query("RUB", description="Currency"),
+    plan: int = Query(..., description="Payment plan"),
     description: str = Query("Ödeme işlemi", description="Payment description"),
     accountId: str = Query("user@example.com", description="User account ID"),
     tg_id: int = Query(..., description="User Telegram ID"),
@@ -37,7 +40,11 @@ async def payment_page(
 ):
     global telegram_id
     global default_language
-    
+    global plan_name
+    global plan_month
+
+    plan_name = "one_month" if plan == 1 else "three_months" if plan == 2 else "six_months"
+    plan_month = plan
     telegram_id = str(tg_id)
     default_language = language
     try:
@@ -48,6 +55,7 @@ async def payment_page(
     return HTMLResponse(get_html(
         amount=amount,
         currency=currency,
+        plan=plan,
         description=lng[default_language]["payment"]["description"],
         accountId=accountId,
         invoiceId=invoiceId,
@@ -61,12 +69,12 @@ async def payment_status(status: bool = Query(..., description="Payment status")
     if status:
         print("Payment was successful")
         db.update_vpn_access(1, telegram_id)
-        print(telegram_id)
-        send_message_to_user(int(telegram_id), lng[default_language]["payment"]["pay_success_message"])
+        db.update_user_plan(plan_month, telegram_id)
+        send_message_to_user(int(telegram_id), lng[default_language]["payment"]["pay_success_message"]+plan_name)
         sleep(5)
         send_message_to_admin(f"Payment was successful for user: {telegram_id}")
         clear_pay_message()
-        return JSONResponse({"message": lng[default_language]["payment"]["pay_success_message"], "success": True})
+        return JSONResponse({"message": lng[default_language]["payment"]["pay_success_message"]+plan_name, "success": True})
     else:
         db.update_vpn_access(0, telegram_id)
         print("Payment failed")

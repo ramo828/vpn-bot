@@ -2,7 +2,7 @@
 setting = dict()
 
 # Telegram botun TOKEN dəyəri — bu, botun Telegram API ilə əlaqə qurması üçün istifadə olunur
-setting['TOKEN'] = "7889585539:AAFhMECL3W1N6yD4nTXMo3nhpmO8UEs5kJk"
+setting['TOKEN'] = ""
 
 # Botun idarəçisi olan istifadəçilərin Telegram ID-ləri
 setting['ADMIN_ID'] = ["464865073", "975254813", "1951682890"]
@@ -20,7 +20,7 @@ setting['pay_server_url'] = "192.168.100.32"
 setting['bot_server_url'] = "192.168.100.32"
 
 # Bot serverində istifadə olunan API açarı — bu, təhlükəsiz məlumat mübadiləsi üçün istifadə olunur
-setting['bot_server_api'] = "aPRGdN1FjhfXBiLm-5YRlA"
+setting['bot_server_api'] = ""
 
 # Ödəniş serverinin istifadə etdiyi port nömrəsi
 setting['pay_server_port'] = "8080"
