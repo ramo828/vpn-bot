@@ -17,3 +17,55 @@ def get_start_buttons(lang_code="ru"):
     except Exception as e:
         print("Buton ayarlama xətası:", e)
         return InlineKeyboardMarkup()
+    
+
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+class KeyboardHandler:
+    """Klavye oluşturma işlemleri için yardımcı sınıf"""
+    @staticmethod
+    def create_plan_keyboard(lang_code, payment, plan_month):
+        """Mevcut planı yenileme klavyesi oluşturur"""
+        markup = InlineKeyboardMarkup(row_width=2)
+        markup.add(
+            InlineKeyboardButton(payment[lang_code]["plan_text"]["yes"], callback_data=f"sub_{plan_month}"),
+            InlineKeyboardButton(payment[lang_code]["plan_text"]["no"], callback_data="choise_plan")
+        )
+        return markup
+
+    @staticmethod
+    def create_countries_keyboard(lang_code, servers):
+        """Ülke seçimi klavyesi oluşturur"""
+        markup = InlineKeyboardMarkup(row_width=2)
+        markup.add(
+            InlineKeyboardButton(servers["France"]["name"], callback_data="buy")
+        )
+        return markup
+
+    @staticmethod
+    def create_protocols_keyboard(lang_code, lang):
+        """Protokol seçimi klavyesi oluşturur"""
+        markup = InlineKeyboardMarkup(row_width=2)
+        markup.add(
+            InlineKeyboardButton(lang[lang_code]["protocols"]["shadow_socks"], callback_data="shadow_socks")
+        )
+        return markup
+
+    @staticmethod
+    def create_partnership_keyboard(lang_code, payment):
+        """Partnerlik klavyesi oluşturur"""
+        markup = InlineKeyboardMarkup(row_width=2)
+        markup.add(
+            InlineKeyboardButton(payment[lang_code]["plan_text"]["yes"], callback_data="yes_partner"),
+            InlineKeyboardButton(payment[lang_code]["plan_text"]["no"], callback_data="cancel")
+        )
+        return markup
+    
+    @staticmethod
+    def create_router_tv_keyboard():
+        markup = InlineKeyboardMarkup(row_width=2)
+        markup.row(
+            InlineKeyboardButton("Router", callback_data="router"),
+            InlineKeyboardButton("Android TV", callback_data="tv")
+        )
+        return markup

@@ -4,10 +4,12 @@ from settings.lang import lang
 from settings.setting import setting
 from settings.pay import payment
 from settings.countries import servers
+from settings.partner import partners, partner_lang
 from utility.util import get_lang_code, get_tg_data
 from urllib.parse import quote
-from vpn_api import VPN         # VPN açarı yaratmaq üçün modul
-from bot_functions.buttons import get_start_buttons
+from settings.router_tv import info_router, info_tv
+from vpn_api import VPN
+from bot_functions.buttons import get_start_buttons, KeyboardHandler
 import traceback
 
 class BotHandler:
@@ -20,7 +22,7 @@ class BotHandler:
         self.pay_message_ids = []
         self.seperator = setting["seperator"]
         self.vpn = VPN()
-    
+
     def send_help(self, message):
         lang_code = get_lang_code(message)
         try:
@@ -30,7 +32,6 @@ class BotHandler:
             traceback.print_exc()
             self.bot.reply_to(message, lang[lang_code]['errors']["error_bot"])
 
-
     def create(self, message):
         lang_code = self.db.get_user_language(message.from_user.id)
         if not lang_code:
@@ -38,22 +39,16 @@ class BotHandler:
             return
         try:
             data = self.db.get_user_by_telegram_id(message.from_user.id)
-
-            # Əgər istifadəçi bazada tapılmayıbsa
             if not data:
                 self.bot.reply_to(message, lang[lang_code]['errors']["user_not_found"])
                 return
-
-            if data[8] == 1 :  # Əgər istifadəçi aktivdirsə
-                if data[6] is None:  # Əgər VPN hələ yaradılmayıbsa
-                    # Eğer gelen first_name boşsa, user_id'yi kullan
+            if data[8] == 1:
+                if data[6] is None:
                     if not get_tg_data(message.from_user)["first_name"]:
-                        self.vpn.json_data = {"name": get_tg_data(message.from_user)["user_id"]}  # Boş ise user_id'yi al
+                        self.vpn.json_data = {"name": get_tg_data(message.from_user)["user_id"]}
                     else:
-                        self.vpn.json_data = {"name": get_tg_data(message.from_user)["first_name"]}  # Aksi takdirde first_name kullanılır
-                    vpn_data = self.vpn.create_key()  # VPN açarı yaradılır
-
-                    # Verilənlər bazasında istifadəçinin VPN məlumatlarını yeniləyirik
+                        self.vpn.json_data = {"name": get_tg_data(message.from_user)["first_name"]}
+                    vpn_data = self.vpn.create_key()
                     self.db.update_vpn_status(
                         telegram_id=message.from_user.id,
                         vpn_server=vpn_data.get("accessUrl"),
@@ -61,23 +56,19 @@ class BotHandler:
                     )
                     self.bot.reply_to(message, lang[lang_code]["vpn_created"]+"✅\n\n" + str(vpn_data))
                 else:
-                    # Əgər artıq VPN varsa, məlumatları göstəririk
                     self.bot.reply_to(
                         message,
                         f"Zatən sizin VPN var \n{self.seperator}\nID: {data[7]}\n{self.seperator}\nSERVER: {data[6]}"
                     )
             else:
-                # Aktiv olmayan istifadəçiyə ödəniş mesajı göndərilir
-                self.bot.reply_to(message,  lang[lang_code]["errors"]["payment_error"])
-
+                self.bot.reply_to(message, lang[lang_code]["errors"]["payment_error"])
         except Exception as e:
             print("Xəta /create:", e)
             traceback.print_exc()
-            self.bot.reply_to(message, lang[lang_code]['vpn_error'])  # Xəta mesajı göndərilir
+            self.bot.reply_to(message, lang[lang_code]['vpn_error'])
 
     def info(self, message):
         lang_code = get_lang_code(message)
-
         try:
             data = self.db.get_user_by_telegram_id(message.from_user.id)
             if data:
@@ -90,20 +81,19 @@ class BotHandler:
             {lang[lang_code]["vpn_data"]["vpn_server"]}: {data[6]}
             {lang[lang_code]["vpn_data"]["vpn_id"]}: {data[7]}
             {lang[lang_code]["vpn_data"]["vpn_status"]}: {'Aktiv ✅' if data[8] == 1 else 'Passiv ❌'}
-            {payment[lang_code]["plan_text"]["active_plan"]}: {payment[lang_code]["plan_text"][data[9]]}  
-            {lang[lang_code]["info"]["lang"]}: {data[10]} 
+            {payment[lang_code]["plan_text"]["active_plan"]}: {payment[lang_code]["plan_text"][data[9]]}
+            {lang[lang_code]["info"]["lang"]}: {data[10]}
             {lang[lang_code]["vpn_data"]["create_date"]}: {data[11]}
             {lang[lang_code]["vpn_data"]["update_date"]}: {data[12]}
     {self.seperator}
                 """
             else:
                 user_info = lang[lang_code]['errors']["user_not_found"]
-
             self.bot.reply_to(message, user_info)
         except Exception as e:
             print("Hata /user_info:", e)
             traceback.print_exc()
-            self.bot.reply_to(message, lang[lang_code]["errors"]["user_not_found"])  # Xəta mesajı göndərilir
+            self.bot.reply_to(message, lang[lang_code]["errors"]["user_not_found"])
 
     def clear_messages(self):
         for message in self.pay_message_ids:
@@ -112,23 +102,18 @@ class BotHandler:
             except Exception as e:
                 print("Xəta mesaj silinərkən:", e)
         self.pay_message_ids.clear()
-    # Bot komutlarını qeydiyyatdan keçirt
-    
+
     def register_commands(self, lang_code="az"):
         try:
             command_texts = lang[lang_code]["commands"]
             commands = [
                 BotCommand("start", command_texts["start"]),
                 BotCommand("help", command_texts["help"]),
-                BotCommand("create", command_texts["create"]),
-                BotCommand("user_info", command_texts["user_info"]),
             ]
             self.bot.set_my_commands(commands)
         except Exception as e:
             print("Komut ayarlama xətası:", e)
 
-
-    # /start komutuna cavab ver
     def handle_start(self, message):
         try:
             lang_code = get_lang_code(message)
@@ -136,8 +121,6 @@ class BotHandler:
             self.default_user_id = user_id
             admin_status = 1 if user_id in self.admin_ids else 0
             tg_data = get_tg_data(message.from_user)
-
-            # Əgər istifadəçi bazada yoxdursa əlavə et
             if not self.db.get_user_by_telegram_id(user_id):
                 self.db.insert_user(
                     name=tg_data["first_name"],
@@ -150,7 +133,6 @@ class BotHandler:
                     vpn_server=None,
                     is_admin=admin_status
                 )
-
             self.register_commands(lang_code)
             keyboard = get_start_buttons(lang_code)
             self.bot.reply_to(message, lang[lang_code]['start_message'], reply_markup=keyboard)
@@ -159,111 +141,38 @@ class BotHandler:
             traceback.print_exc()
             self.bot.reply_to(message, lang[lang_code]['error_bot'])
 
-    # Callback funksiyalarını idarə et
-    def handle_callback(self, call):
-        try:
-            lang_code = self.db.get_user_language(self.default_user_id)
-
-            if call.data == "buy":
-                user_data = self.db.get_user_by_telegram_id(call.from_user.id)
-                user_vpn_status = self.db.is_vpn_active(call.from_user.id)
-                if user_vpn_status is None:
-                    if(user_data[6] is not None):
-                        self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']} {user_data[6]}", parse_mode="Markdown")
-                else:
-                    self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['key_not_found']}")
-                    self.send_web_app(call.message, lang_code)
-                    if (user_data[6] is None) and user_vpn_status:
-                        self.create(call.message)
-                        # self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']} {user_data[6]}", parse_mode="Markdown")
-
-            elif call.data == "renew":
-                plan_month = self.db.get_user_plan(call.from_user.id)
-                if(plan_month == 0):
-                    self.bot.send_message(call.message.chat.id, payment[lang_code]["plan_text"]["no_plan"])
-                    self.send_web_app(call.message, lang_code)
-                    return
-                default_plan_keyboard = InlineKeyboardMarkup(row_width=2)
-                default_plan_keyboard.add(
-                    InlineKeyboardButton(payment[lang_code]["plan_text"]["yes"], callback_data="sub_"+str(plan_month)),
-                    InlineKeyboardButton(payment[lang_code]["plan_text"]["no"], callback_data="choise_plan"),
-                )
-                self.bot.send_message(call.message.chat.id, payment[lang_code]["plan_text"]["plan_info"]+" "+payment[lang_code]["plan_text"][plan_month] + " " + payment[lang_code]["plan_text"]["plan_question"], reply_markup=default_plan_keyboard)
-            elif call.data == "change_country":
-                self.bot.send_message(call.message.chat.id, lang[lang_code]["servers"]["info_1"])
-                countries_keyboard = InlineKeyboardMarkup(row_width=2)
-                countries_keyboard.add(
-                    InlineKeyboardButton(servers["France"]["name"], callback_data="buy"),
-                )
-                self.bot.send_message(call.message.chat.id, lang[lang_code]["servers"]["question"], reply_markup=countries_keyboard)
-            elif call.data == "active_keys":
-                user_data = self.db.get_user_by_telegram_id(call.from_user.id)
-                if user_data and user_data[6]:
-                    self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']} {user_data[6]}", parse_mode="Markdown")
-                else:
-                    self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['key_not_found']}")
-
-            elif call.data == "change_protocol":
-                self.bot.send_message(call.message.chat.id, lang[lang_code]["protocols"]["info_1"])
-                protocols_keyboard = InlineKeyboardMarkup(row_width=2)
-                protocols_keyboard.add(
-                    InlineKeyboardButton(lang[lang_code]["protocols"]["shadow_socks"], callback_data="shadow_socks"),
-                )
-                self.bot.send_message(call.message.chat.id, lang[lang_code]["protocols"]["question"], reply_markup=protocols_keyboard)
-            elif call.data == "cancel":
-                self.bot.delete_message(call.message.chat.id, call.message.message_id)
-                self.bot.send_message(call.message.chat.id, lang[lang_code]["payment"]["cancel_message"])
-            elif call.data == "sub_1":
-                # 1 aylıq tarif üçün ödəniş prosesini başlat
-                print("1 aylıq ödəniş")
-                self.run_payment_app(call.message, lang_code, months=1)
-            elif call.data == "sub_3":
-                # 3 aylıq tarif üçün ödəniş prosesini başlat
-                print("3 aylıq ödəniş")
-                self.run_payment_app(call.message, lang_code, months=3)
-            elif call.data == "sub_6":
-                # 6 aylıq tarif üçün ödəniş prosesini başlat
-                print("6 aylıq ödəniş")
-                self.run_payment_app(call.message, lang_code, months=6)
-            elif call.data == "choise_plan":
-                self.send_web_app(call.message, lang_code)
-            else:
-                # Digər callback məlumatlarını işləyin
-                pass
-        except Exception as e:
-                print("Callback xətası:", e)
-                self.bot.answer_callback_query(call.id, payment[lang_code]["plan_text"]["error"])
-
-
-
-    # Ödəniş üçün Web App göndər
     def send_web_app(self, message, lang_code):
         if self.db.is_vpn_active(message.from_user.id):
             self.bot.send_message(message.chat.id, lang[lang_code]["vpn_already_exists"])
             return
         markup = InlineKeyboardMarkup(row_width=3)
         markup.add(
-                InlineKeyboardButton("1 ay - "+str(payment[lang_code]["price_settings"]["one_month"]["price"]) + " " + payment[lang_code]["price_settings"]["one_month"]["currency"], callback_data="sub_1"),
-                InlineKeyboardButton("3 ay - "+str(payment[lang_code]["price_settings"]["three_months"]["price"]) + " " + payment[lang_code]["price_settings"]["three_months"]["currency"], callback_data="sub_3"),
-                InlineKeyboardButton("6 ay - "+str(payment[lang_code]["price_settings"]["six_months"]["price"]) + " " + payment[lang_code]["price_settings"]["six_months"]["currency"], callback_data="sub_6")
+            InlineKeyboardButton(
+                f"1 {payment[lang_code]['plan_text']['month']} - {payment[lang_code]['price_settings']['one_month']['price']} {payment[lang_code]['price_settings']['one_month']['currency']}",
+                callback_data="sub_1"
+            ),
+            InlineKeyboardButton(
+                f"3 {payment[lang_code]['plan_text']['month']} - {payment[lang_code]['price_settings']['three_months']['price']} {payment[lang_code]['price_settings']['three_months']['currency']}",
+                callback_data="sub_3"
+            ),
+            InlineKeyboardButton(
+                f"6 {payment[lang_code]['plan_text']['month']} - {payment[lang_code]['price_settings']['six_months']['price']} {payment[lang_code]['price_settings']['six_months']['currency']}",
+                callback_data="sub_6"
             )
+        )
         self.bot.send_message(
-                message.chat.id,
-                lang[lang_code]["payment"]["plan_query"],
-                reply_markup=markup
-            )
-     
+            message.chat.id,
+            lang[lang_code]["payment"]["plan_query"],
+            reply_markup=markup
+        )
+
     def run_payment_app(self, message, lang_code, months=1):
         markup = InlineKeyboardMarkup(row_width=2)
-        month = {
-            1: "one_month",
-            3: "three_months",
-            6: "six_months"
-        }
+        month = {1: "one_month", 3: "three_months", 6: "six_months"}
         web_app_url = (
             f"{self.public_url}/pay"
             f"?amount={str(payment[lang_code]['price_settings'][month[months]]['price'])}"
-            f"&currency={payment[lang_code]['price_settings'][month[months]]['currency']}"
+            f"¤cy={payment[lang_code]['price_settings'][month[months]]['currency']}"
             f"&plan={months}"
             f"&description={quote(lang[lang_code]['payment']['description'])}"
             f"&accountId={message.from_user.id}"
@@ -271,14 +180,120 @@ class BotHandler:
             f"&tg_id={self.default_user_id}"
             f"&lang={lang_code}"
         )
-
         web_app = WebAppInfo(url=web_app_url)
         markup.add(InlineKeyboardButton(lang[lang_code]["payment"]["button"], web_app=web_app))
-
         self.pay_message_ids.append(self.bot.send_message(
             message.chat.id,
             lang[lang_code]["payment"]["description"],
             reply_markup=markup
         ))
 
+    # Yeni callback işleyicileri
+    def handle_buy(self, call, lang_code):
+        user_data = self.db.get_user_by_telegram_id(call.from_user.id)
+        user_vpn_status = self.db.is_vpn_active(call.from_user.id)
+        if user_vpn_status is None:
+            if user_data[6]:
+                self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']} {user_data[6]}", parse_mode="Markdown")
+            else:
+                self.bot.send_message(call.message.chat.id, lang[lang_code]['keys']['key_not_found'])
+                self.send_web_app(call.message, lang_code)
+        else:
+            self.bot.send_message(call.message.chat.id, lang[lang_code]['keys']['key_not_found'])
+            self.send_web_app(call.message, lang_code)
+            if not user_data[6] and user_vpn_status:
+                self.create(call.message)
 
+    def handle_renew(self, call, lang_code):
+        plan_month = self.db.get_user_plan(call.from_user.id)
+        if plan_month == 0:
+            self.bot.send_message(call.message.chat.id, payment[lang_code]["plan_text"]["no_plan"])
+            self.send_web_app(call.message, lang_code)
+            return
+        markup = KeyboardHandler.create_plan_keyboard(lang_code, payment, plan_month)
+        self.bot.send_message(
+            call.message.chat.id,
+            f"{payment[lang_code]['plan_text']['plan_info']} {payment[lang_code]['plan_text'][plan_month]} {payment[lang_code]['plan_text']['plan_question']}",
+            reply_markup=markup
+        )
+
+    def handle_change_country(self, call, lang_code):
+        self.bot.send_message(call.message.chat.id, lang[lang_code]["servers"]["info_1"])
+        markup = KeyboardHandler.create_countries_keyboard(lang_code, servers)
+        self.bot.send_message(call.message.chat.id, lang[lang_code]["servers"]["question"], reply_markup=markup)
+
+    def handle_active_keys(self, call, lang_code):
+        user_data = self.db.get_user_by_telegram_id(call.from_user.id)
+        if user_data and user_data[6]:
+            self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']} {user_data[6]}", parse_mode="Markdown")
+        else:
+            self.bot.send_message(call.message.chat.id, lang[lang_code]['keys']['key_not_found'])
+
+    def handle_change_protocol(self, call, lang_code):
+        self.bot.send_message(call.message.chat.id, lang[lang_code]["protocols"]["info_1"])
+        markup = KeyboardHandler.create_protocols_keyboard(lang_code, lang)
+        self.bot.send_message(call.message.chat.id, lang[lang_code]["protocols"]["question"], reply_markup=markup)
+
+    def handle_cancel(self, call, lang_code):
+        self.bot.delete_message(call.message.chat.id, call.message.message_id)
+        self.bot.send_message(call.message.chat.id, lang[lang_code]["payment"]["cancel_message"])
+
+    def handle_subscription(self, call, lang_code, months):
+        self.run_payment_app(call.message, lang_code, months=months)
+
+    def handle_partnership(self, call, lang_code):
+        for partner in partners:
+            self.bot.send_message(
+                call.message.chat.id,
+                f"\n{partner.name}\n{partner.url}\n{partner.description}\n{self.seperator}"
+            )
+        markup = KeyboardHandler.create_partnership_keyboard(lang_code, payment)
+        self.bot.send_message(
+            call.message.chat.id,
+            partner_lang[lang_code]["question"],
+            reply_markup=markup
+        )
+    def handle_router_tv(self, call, lang_code):
+        markup = KeyboardHandler.create_router_tv_keyboard()
+        self.bot.send_message(
+            call.message.chat.id,
+            lang[lang_code]["info"]["device_question"],
+            reply_markup=markup
+        )
+
+    def handle_callback(self, call):
+        try:
+            lang_code = self.db.get_user_language(self.default_user_id)
+            callback_data = call.data
+
+            handlers = {
+                "buy": self.handle_buy,
+                "renew": self.handle_renew,
+                "change_country": self.handle_change_country,
+                "active_keys": self.handle_active_keys,
+                "change_protocol": self.handle_change_protocol,
+                "cancel": self.handle_cancel,
+                "router_tv": self.handle_router_tv,
+                "sub_1": lambda c, l: self.handle_subscription(c, l, 1),
+                "sub_3": lambda c, l: self.handle_subscription(c, l, 3),
+                "sub_6": lambda c, l: self.handle_subscription(c, l, 6),
+                "choise_plan": lambda c, l: self.send_web_app(c.message, l),
+                "partnership": self.handle_partnership,
+                "yes_partner": lambda c, l: self.bot.send_message(c.message.chat.id, partner_lang[lang_code]["contact_message"]+"\n"+ partner_lang[lang_code]["contact"]),
+                "shadow_socks": lambda c, l: self.bot.send_message(c.message.chat.id, lang[lang_code]["protocols"]["select_shadowsock"]),
+                "invite": lambda c, l: self.bot.send_message(c.message.chat.id, "https://t.me/uncencored_best_vpn_bot"),
+                "router": lambda c, l: self.bot.send_message(c.message.chat.id, info_router[lang_code]),
+                "tv": lambda c, l: self.bot.send_message(c.message.chat.id, info_tv[lang_code]),
+
+            }
+
+            handler = handlers.get(callback_data)
+            if handler:
+                handler(call, lang_code)
+                self.bot.answer_callback_query(call.id)  # Callback'e yanıt gönder
+            else:
+                self.bot.answer_callback_query(call.id, payment[lang_code]["plan_text"]["error"])
+        except Exception as e:
+            print(f"Callback xətası: {e}")
+            traceback.print_exc()
+            self.bot.answer_callback_query(call.id, payment[lang_code]["plan_text"]["error"])

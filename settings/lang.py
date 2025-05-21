@@ -75,7 +75,8 @@ lang["az"] = {
         "info_1": "Hələlik sadecə shadowsocks protokollarını dəstəkləyirik.\n\n",
         "question": "Hansı protokolu seçmək istəyirsiniz?",
         "question_2": "Hansı protokolu seçmək istəyirsiniz? (default: WireGuard)",
-        "cancel_message":"❌ Əməliyyat ləğv edildi."     
+        "cancel_message":"❌ Əməliyyat ləğv edildi.",
+        "select_shadowsock": "ShadowSocks protokolu seçildi."
     },
     "keys": {
         "key": "Açar",
@@ -96,6 +97,7 @@ lang["az"] = {
         "lang":"Botun dili: ",
         "success": "Botun dili dəyişdirildi.",
         "error": "Botun dili dəyişdiriləmedi. Zəhmət olmasa /start yazın.",
+        "device_question":"Hansı cihaz üçün təlimatları istəyirsiz?"
     }
 }
 
@@ -174,7 +176,8 @@ lang["tr"] = {
         "info_1": "Şimdilik sadece shadowsocks protokollarını destekliyoruz.\n\n",
         "question": "Hangı protokolu seçmek istersiniz?",
         "question_2": "Hansı protokolu seçmək istəyirsiniz? (default: WireGuard)",        
-        "cancel_message":"❌ İşlem iptal edildi."     
+        "cancel_message":"❌ İşlem iptal edildi.",
+        "select_shadowsock": "ShadowSocks protokolü seçildi"
     },
      "keys": {
         "key": "Anahtar",
@@ -195,6 +198,7 @@ lang["tr"] = {
         "lang": "Botun dili: ",
         "success": "Botun dili dəyişdirildi",
         "error": "Botun dili dəyişdiriləmedi. Lütfen /start yazın.",
+        "device_question":"Hangi cihaz için talimatları istiyorsunuz?"
     }
 }
 
@@ -274,7 +278,8 @@ lang["ru"] = {
         "info_1": "На данный момент мы поддерживаем только протоколы shadowsocks.\n\n",
         "question": "Какой протокол вы хотите выбрать?",
         "question_2": "Какой протокол вы хотите выбрать? (по умолчанию: WireGuard)",
-        "cancel_message":"❌ Операция отменена."
+        "cancel_message":"❌ Операция отменена.",
+        "select_shadowsock": "Протокол ShadowSocks выбран."
     },
       "keys": {
         "key": "Ключ",
@@ -294,7 +299,8 @@ lang["ru"] = {
      "info": {
         "lang": "Язык бота: ",
         "success": "Язык бота был изменён.",
-        "error": "Не удалось изменить язык бота. Пожалуйста, введите /start."
+        "error": "Не удалось изменить язык бота. Пожалуйста, введите /start.",
+        "device_question":"Для какого устройства вы хотите получить инструкции?"
 }
 }
 
@@ -373,7 +379,8 @@ lang["en"] = {
         "info_1": "Currently, we only support shadowsocks protocols.\n\n",
         "question": "Which protocol would you like to choose?",
         "question_2": "Which protocol would you like to choose? (default: WireGuard)",
-        "cancel_message":"❌ Operation canceled."
+        "cancel_message":"❌ Operation canceled.",
+        "select_shadowsock":"The ShadowSocks protocol has been selected."
     },
       "keys": {
         "key": "Key",
@@ -393,6 +400,7 @@ lang["en"] = {
     "info": {
         "lang": "Bot language: ",
         "success": "Bot language has been changed.",
-        "error": "Failed to change bot language. Please type /start."
+        "error": "Failed to change bot language. Please type /start.",
+        "device_question":"Which device do you want instructions for?"
 }
 }

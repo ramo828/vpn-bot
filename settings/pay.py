@@ -16,6 +16,7 @@ payment["az"] = {
       }
   },
   "plan_text": {
+      0: "Hər hansı bir plan yoxdur",
       1: "1 aylıq plan",
       3: "3 aylıq plan",
       6: "6 aylıq plan",
@@ -26,7 +27,8 @@ payment["az"] = {
       "plan_question": "Bu plan ilə davam etmək istəyirsiniz?",
       "yes": "Bəli",
       "no": "Xeyr",
-      "error": "❌ Əməliyyat zamanı xəta baş verdi!"
+      "error": "❌ Əməliyyat zamanı xəta baş verdi!",
+      "month":"ay"
   }
 }
 payment["tr"] = {
@@ -45,6 +47,7 @@ payment["tr"] = {
         }
     },
      "plan_text": {
+      0: "Herhangi bir plan bulunmamaktadır",
       1: "1 aylık plan",
       3: "3 aylık plan",
       6: "6 aylık plan",
@@ -55,8 +58,8 @@ payment["tr"] = {
         "plan_question":"Bu plan ile devam etmek istiyor musunuz?",
         "yes": "Evet",
         "no": "Hayır",
-        "error": "❌ İşlem sırasında hata oluştu!"
-
+        "error": "❌ İşlem sırasında hata oluştu!",
+        "month":"ay"
   }
 }
 payment["ru"] = {
@@ -75,6 +78,7 @@ payment["ru"] = {
        }
     },
       "plan_text": {
+      0: "Нет плана",
       1: "1 месячный план",
       3: "3 месячный план",
       6: "6 месячный план",
@@ -85,7 +89,8 @@ payment["ru"] = {
         "plan_question":"Вы хотите продолжить с этим планом?",
         "yes": "Да",
         "no": "Нет",
-        "error": "❌ Произошла ошибка во время операции!"
+        "error": "❌ Произошла ошибка во время операции!",
+        "month":"месяч"
   }
 }
 
@@ -105,6 +110,7 @@ payment["en"] = {
         }
     },
       "plan_text": {
+      0: "There is no plan",
       1: "1 month plan",
       3: "3 month plan",
       6: "6 month plan",
@@ -115,7 +121,8 @@ payment["en"] = {
         "plan_question":"Do you want to continue with this plan?",
         "yes": "Yes",
         "no": "No",
-        "error": "❌ An error occurred during the operation!"
+        "error": "❌ An error occurred during the operation!",
+        "month": "month"
   }
     
 }
