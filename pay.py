@@ -7,7 +7,7 @@ from settings.setting import setting
 from time import sleep
 from database import Database
 from html_data.pay_data import get_html
-from bot import send_message_to_admin, send_message_to_user, clear_pay_message
+from bot import send_message_to_admin, send_message_to_user, clear_pay_message, success_callback
 import json
 
 app = FastAPI()
@@ -74,6 +74,7 @@ async def payment_status(status: bool = Query(..., description="Payment status")
         sleep(5)
         send_message_to_admin(f"Payment was successful for user: {telegram_id}")
         clear_pay_message()
+        success_callback(telegram_id=telegram_id, month=plan_month)
         return JSONResponse({"message": lng[default_language]["payment"]["pay_success_message"]+" "+plan_name, "success": True})
     else:
         db.update_vpn_access(0, telegram_id)

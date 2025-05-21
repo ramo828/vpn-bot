@@ -46,6 +46,7 @@ def user_info(message):
 @bot.message_handler(commands=['help'])
 def send_help(message):
     handler.send_help(message)
+    
 
 # Ödəniş mesajlarını təmizləmək üçün funksiya
 # Bu funksiyanı istənilən yerdən çağırıb, göndərilən ödəniş bildirişlərini silə bilərik
@@ -61,6 +62,14 @@ def send_message_to_admin(message):
 # İstifadəçiyə birbaşa mesaj göndərmək üçün funksiya
 def send_message_to_user(telegram_id: int, message: str):
     bot.send_message(telegram_id, message)
+
+def success_callback(month:int, telegram_id:int):
+    data = db.get_user_by_telegram_id(telegram_id)
+    db.set_user_plan(telegram_id=telegram_id, plan=month)
+    if(data[6] is not None):
+        bot.send_message(telegram_id, data[6]+" "+ data[7])
+    else:
+        bot.send_message(telegram_id, lang[lang_code]["start_message"])
 
 # Callback sorğularını yönləndirən handler
 @bot.callback_query_handler(func=lambda call: True)

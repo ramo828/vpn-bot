@@ -90,8 +90,10 @@ class BotHandler:
             {lang[lang_code]["vpn_data"]["vpn_server"]}: {data[6]}
             {lang[lang_code]["vpn_data"]["vpn_id"]}: {data[7]}
             {lang[lang_code]["vpn_data"]["vpn_status"]}: {'Aktiv ✅' if data[8] == 1 else 'Passiv ❌'}
-            {lang[lang_code]["vpn_data"]["create_date"]}: {data[9]}
-            {lang[lang_code]["vpn_data"]["update_date"]}: {data[10]}
+            {payment[lang_code]["plan_text"]["active_plan"]}: {payment[lang_code]["plan_text"][data[9]]}  
+            {lang[lang_code]["info"]["lang"]}: {data[10]} 
+            {lang[lang_code]["vpn_data"]["create_date"]}: {data[11]}
+            {lang[lang_code]["vpn_data"]["update_date"]}: {data[12]}
     {self.seperator}
                 """
             else:
@@ -166,11 +168,14 @@ class BotHandler:
                 user_data = self.db.get_user_by_telegram_id(call.from_user.id)
                 user_vpn_status = self.db.is_vpn_active(call.from_user.id)
                 if user_vpn_status is None:
-                    self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']} {user_data[6]}", parse_mode="Markdown")
-                    return
+                    if(user_data[6] is not None):
+                        self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']} {user_data[6]}", parse_mode="Markdown")
                 else:
                     self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['key_not_found']}")
                     self.send_web_app(call.message, lang_code)
+                    if (user_data[6] is None) and user_vpn_status:
+                        self.create(call.message)
+                        # self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']} {user_data[6]}", parse_mode="Markdown")
 
             elif call.data == "renew":
                 plan_month = self.db.get_user_plan(call.from_user.id)
@@ -275,3 +280,5 @@ class BotHandler:
             lang[lang_code]["payment"]["description"],
             reply_markup=markup
         ))
+
+

@@ -91,6 +91,11 @@ lang["az"] = {
         "info": "Server seçimi",
         "info_1": "Hələlik yalnızca Fransa serverini dəstəkləyirik.\n\n",
         "question": "Hansı ölkəni seçmək istəyirsiniz?",
+    },
+    "info":{
+        "lang":"Botun dili: ",
+        "success": "Botun dili dəyişdirildi.",
+        "error": "Botun dili dəyişdiriləmedi. Zəhmət olmasa /start yazın.",
     }
 }
 
@@ -185,6 +190,11 @@ lang["tr"] = {
         "info": "Sunucu seçimi",
         "info_1": "Şu anda yalnızca Fransa sunucusunu destekliyoruz.\n\n",
         "question": "Hangi ülkeyi seçmek istersiniz?",
+    },
+     "info":{
+        "lang": "Botun dili: ",
+        "success": "Botun dili dəyişdirildi",
+        "error": "Botun dili dəyişdiriləmedi. Lütfen /start yazın.",
     }
 }
 
@@ -280,7 +290,12 @@ lang["ru"] = {
         "info": "Выбор сервера",
         "info_1": "В настоящее время мы поддерживаем только сервер Франции.\n\n",
         "question": "Какую страну вы хотите выбрать?",
-    }
+    },
+     "info": {
+        "lang": "Язык бота: ",
+        "success": "Язык бота был изменён.",
+        "error": "Не удалось изменить язык бота. Пожалуйста, введите /start."
+}
 }
 
 # English
@@ -374,5 +389,10 @@ lang["en"] = {
         "info": "Server selection",
         "info_1": "Currently, we only support France server.\n\n",
         "question": "Which country would you like to choose?",
-    }
+    },
+    "info": {
+        "lang": "Bot language: ",
+        "success": "Bot language has been changed.",
+        "error": "Failed to change bot language. Please type /start."
+}
 }
