@@ -3,15 +3,19 @@ payment = {}
 payment["az"] = {
   "price_settings" : {
       "one_month": {
-          "price": 5,
+          "price": 5.0,
           "currency": "AZN"
       },
        "three_months": {
-          "price": 8,
+          "price": 8.0,
           "currency": "AZN"
       }, 
        "six_months": {
-          "price": 17,
+          "price": 17.0,
+          "currency": "AZN"
+      },
+      "one_year": {
+          "price": 34.0,
           "currency": "AZN"
       }
   },
@@ -20,6 +24,8 @@ payment["az"] = {
       1: "1 aylıq plan",
       3: "3 aylıq plan",
       6: "6 aylıq plan",
+      12 :"1 illik plan",
+
       "active_plan": "Aktiv plan: ",
       "no_plan": "Siz daha öncə heç bir plan almamısınız.\nZəhmət olmasa ödəniş edin.",
       "plan_info": "Bundan öncəki planın müddəti: ",
@@ -34,23 +40,29 @@ payment["az"] = {
 payment["tr"] = {
      "price_settings" : {
         "one_month": {
-            "price": 170,
+            "price": 170.0,
             "currency": "TRY"
         },
         "three_months": {
-            "price": 300,
+            "price": 300.0,
             "currency": "TRY"
         },
         "six_months": {
-            "price": 520,
+            "price": 520.0,
             "currency": "TRY"
-        }
+        },
+        "one_year": {
+          "price": 980.0,
+          "currency": "TRY"
+      }
     },
      "plan_text": {
       0: "Herhangi bir plan bulunmamaktadır",
       1: "1 aylık plan",
       3: "3 aylık plan",
       6: "6 aylık plan",
+      12: "1 yıllık plan",
+
         "active_plan": "Aktif planınız: ",
         "no_plan": "Siz daha önce hiç bir plan almadınız.\nLütfen ödeme yapın.",
         "plan_info":"Bundan önceki planın süresi: ",
@@ -65,23 +77,28 @@ payment["tr"] = {
 payment["ru"] = {
      "price_settings" : {
         "one_month": {
-            "price": 250,
+            "price": 250.0,
             "currency": "RUB"
         },
        "three_months": {
-           "price": 450,
+           "price": 450.0,
            "currency": "RUB"
        },
        "six_months": {
-           "price": 700,
+           "price": 700.0,
            "currency": "RUB"
-       }
+       },
+       "one_year": {
+          "price": 1200.0,
+          "currency": "RUB"
+      }
     },
       "plan_text": {
       0: "Нет плана",
       1: "1 месячный план",
       3: "3 месячный план",
       6: "6 месячный план",
+      12: "1 годичный план",
         "active_plan": "Активный план: ",
         "no_plan": "Вы не приобрели ни одного плана.\nПожалуйста, оплатите.",
         "plan_info":"Бывший план действовал: ",
@@ -97,23 +114,29 @@ payment["ru"] = {
 payment["en"] = {
      "price_settings" : {
         "one_month": {
-            "price": 10,
+            "price": 10.0,
             "currency": "USD"
         },
         "three_months": {
-           "price": 30,
+           "price": 30.0,
            "currency": "USD"
        }, 
         "six_months": {
-              "price": 50,
+              "price": 50.0,
               "currency": "USD"
-        }
+        },
+        "one_year": {
+          "price": 90.0,
+          "currency": "USD"
+      }
+
     },
       "plan_text": {
       0: "There is no plan",
       1: "1 month plan",
       3: "3 month plan",
       6: "6 month plan",
+      12: "1 year plan",
         "active_plan": "Active plan: ",
         "no_plan": "You have not purchased any plan.\nPlease pay.",
         "plan_info":"Previous plan duration: ",

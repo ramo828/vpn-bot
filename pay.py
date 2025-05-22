@@ -43,7 +43,7 @@ async def payment_page(
     global plan_name
     global plan_month
 
-    plan_name = "one_month" if plan == 1 else "three_months" if plan == 2 else "six_months"
+    plan_name = "one_month" if plan == 1 else "three_months" if plan == 2 else "six_months" if plan == 6 else "one_year"
     plan_month = plan
     telegram_id = str(tg_id)
     default_language = language

@@ -11,6 +11,7 @@ from settings.router_tv import info_router, info_tv
 from vpn_api import VPN
 from bot_functions.buttons import get_start_buttons, KeyboardHandler
 from files.files import files, file_lang
+from settings.design import design
 import traceback
 from time import sleep
 import os
@@ -139,7 +140,7 @@ class BotHandler:
                 )
             self.register_commands(lang_code)
             keyboard = get_start_buttons(lang_code)
-            self.bot.reply_to(message, lang[lang_code]['start_message'], reply_markup=keyboard)
+            self.bot.reply_to(message, lang[lang_code]['start_message'], reply_markup=keyboard, )
         except Exception as e:
             print("Xəta /start:", e)
             traceback.print_exc()
@@ -149,7 +150,7 @@ class BotHandler:
         if self.db.is_vpn_active(message.from_user.id):
             self.bot.send_message(message.chat.id, lang[lang_code]["vpn_already_exists"])
             return
-        markup = InlineKeyboardMarkup(row_width=3)
+        markup = InlineKeyboardMarkup(row_width=design["plan_row_width"])
         markup.add(
             InlineKeyboardButton(
                 f"1 {payment[lang_code]['plan_text']['month']} - {payment[lang_code]['price_settings']['one_month']['price']} {payment[lang_code]['price_settings']['one_month']['currency']}",
@@ -162,21 +163,31 @@ class BotHandler:
             InlineKeyboardButton(
                 f"6 {payment[lang_code]['plan_text']['month']} - {payment[lang_code]['price_settings']['six_months']['price']} {payment[lang_code]['price_settings']['six_months']['currency']}",
                 callback_data="sub_6"
+            ),
+            InlineKeyboardButton(
+                f"12 {payment[lang_code]['plan_text']['month']} - {payment[lang_code]['price_settings']['one_year']['price']} {payment[lang_code]['price_settings']['one_year']['currency']}",
+                callback_data="sub_12"
             )
         )
         self.bot.send_message(
             message.chat.id,
             lang[lang_code]["payment"]["plan_query"],
             reply_markup=markup
+
         )
 
     def run_payment_app(self, message, lang_code, months=1):
-        markup = InlineKeyboardMarkup(row_width=2)
-        month = {1: "one_month", 3: "three_months", 6: "six_months"}
+        markup = InlineKeyboardMarkup(row_width=design["payment_row_width"])
+        month = {
+            1: "one_month",
+            3: "three_months",
+            6: "six_months",
+            12: "one_year"
+            }
         web_app_url = (
             f"{self.public_url}/pay"
             f"?amount={str(payment[lang_code]['price_settings'][month[months]]['price'])}"
-            f"¤cy={payment[lang_code]['price_settings'][month[months]]['currency']}"
+            f"&currency={payment[lang_code]['price_settings'][month[months]]['currency']}"
             f"&plan={months}"
             f"&description={quote(lang[lang_code]['payment']['description'])}"
             f"&accountId={message.from_user.id}"
@@ -316,6 +327,7 @@ class BotHandler:
                 "sub_1": lambda c, l: self.handle_subscription(c, l, 1),
                 "sub_3": lambda c, l: self.handle_subscription(c, l, 3),
                 "sub_6": lambda c, l: self.handle_subscription(c, l, 6),
+                "sub_12": lambda c, l: self.handle_subscription(c, l, 12),
                 "choise_plan": lambda c, l: self.send_web_app(c.message, l),
                 "partnership": self.handle_partnership,
                 "yes_partner": lambda c, l: self.bot.send_message(c.message.chat.id, partner_lang[lang_code]["contact_message"]+"\n"+ partner_lang[lang_code]["contact"]),
