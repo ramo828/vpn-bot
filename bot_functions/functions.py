@@ -352,7 +352,8 @@ class BotHandler:
                     self.bot.send_message(chat_id, {file_lang[lang_code]["file_not_found"]})
                     self.bot.answer_callback_query(call.id)
                 except Exception as e:
-                    self.bot.send_message(chat_id, f"{file_lang[lang_code]["error"]} - {e}")
+                    error_text = file_lang[lang_code]["error"]
+                    self.bot.send_message(chat_id, f"{error_text} - {e}")
                     self.bot.answer_callback_query(call.id)
                 return
             handler = handlers.get(callback_data)
