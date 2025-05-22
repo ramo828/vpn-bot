@@ -87,7 +87,8 @@ lang["az"] = {
         "key_expire_date": "Açar bitmə tarixi",
         "key_info": "Açar məlumatları",
         "active_key_info": "🔑 Aktiv açarınız: ",
-        "key_not_found": "❌ Aktiv açar tapılmadı!"
+        "key_not_found": "❌ Aktiv açar tapılmadı!",
+        "question" : "Yeni açar yaratmaq istəyirsiniz?"
     },
     "servers":{
         "info": "Server seçimi",
@@ -191,7 +192,9 @@ lang["tr"] = {
         "key_expire_date": "Anahtar bitiş tarihi",
         "key_info": "Anahtar bilgileri",
         "active_key_info": "🔑 Aktif anahtarınız: ",
-        "key_not_found": "❌ Aktif anahtar bulunamadı!"
+        "key_not_found": "❌ Aktif anahtar bulunamadı!",
+        "question" : "Yeni bir anahtar oluşturmak ister misiniz?"
+
     },
      "servers":{
         "info": "Sunucu seçimi",
@@ -295,7 +298,9 @@ lang["ru"] = {
         "key_expire_date": "Ключ истечение даты",
         "key_info": "Ключ информация",
         "active_key_info": "🔑 Ваш активный ключ: ",
-        "key_not_found": "❌ Актив ключ не найден!"
+        "key_not_found": "❌ Актив ключ не найден!",
+        "question" : "Хотите создать новый ключ?"
+
     },
     "servers":{
         "info": "Выбор сервера",
@@ -400,7 +405,8 @@ lang["en"] = {
         "key_expire_date": "Key Expiration Date",
         "key_info": "Key Information",
         "active_key_info": "🔑 Your Active Key: ",
-        "key_not_found": "❌ Active Key Not Found!"
+        "key_not_found": "❌ Active Key Not Found!",
+        "question" : "Would you like to create a new key?"
     },
     "servers":{
         "info": "Server selection",

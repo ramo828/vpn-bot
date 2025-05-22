@@ -1,6 +1,7 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from settings.lang import lang
 from files.files import file_lang
+from settings.pay import payment
 from pathlib import Path
 
 def get_start_buttons(lang_code="ru"):
@@ -84,6 +85,18 @@ class KeyboardHandler:
 
         )
         return markup
+    
+
+    @staticmethod
+    def create_key_question_keyboard(lang_code):
+        markup = InlineKeyboardMarkup(row_width=3)
+        markup.row(
+            InlineKeyboardButton(payment[lang_code]["plan_text"]["yes"], callback_data="buy"),
+            InlineKeyboardButton(payment[lang_code]["plan_text"]["no"], callback_data="cancel"),
+
+        )
+        return markup
+
     @staticmethod
     def create_files_keyboard(file_list: list):
         markup = InlineKeyboardMarkup(row_width=2)

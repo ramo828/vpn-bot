@@ -12,6 +12,7 @@ from vpn_api import VPN
 from bot_functions.buttons import get_start_buttons, KeyboardHandler
 from files.files import files, file_lang
 import traceback
+from time import sleep
 import os
 
 
@@ -231,6 +232,11 @@ class BotHandler:
             self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']} {user_data[6]}", parse_mode="Markdown")
         else:
             self.bot.send_message(call.message.chat.id, lang[lang_code]['keys']['key_not_found'])
+            sleep(1)
+            markup = KeyboardHandler.create_key_question_keyboard(lang_code)
+            self.bot.send_message(call.message.chat.id, lang[lang_code]["keys"]["question"], reply_markup=markup)
+
+
 
     def handle_change_protocol(self, call, lang_code):
         self.bot.send_message(call.message.chat.id, lang[lang_code]["protocols"]["info_1"])
@@ -239,7 +245,7 @@ class BotHandler:
 
     def handle_cancel(self, call, lang_code):
         self.bot.delete_message(call.message.chat.id, call.message.message_id)
-        self.bot.send_message(call.message.chat.id, lang[lang_code]["payment"]["cancel_message"])
+        self.bot.send_message(call.message.chat.id, lang[lang_code]["protocols"]["cancel_message"])
 
     def handle_subscription(self, call, lang_code, months):
         self.run_payment_app(call.message, lang_code, months=months)
@@ -328,16 +334,17 @@ class BotHandler:
                 file_path = current_directory+"/"+callback_data.split("_", 2)[1:][0]
                 chat_id = call.message.chat.id
                 try:
+                    load_text = file_lang[lang_code]["load"]
                     ext = file_path.lower().split('.')[-1]
                     if ext in ['jpg', 'jpeg', 'png']:
                         with open(file_path, 'rb') as resim:
-                            self.bot.send_photo(chat_id, resim, caption=f"{file_path.split('/')[-1] + " " +file_lang[lang_code]["load"]}")
+                            self.bot.send_photo(chat_id, resim, caption=f"{file_path.split('/')[-1]} {load_text}")
                     elif ext in ['mp4', 'mov']:
                         with open(file_path, 'rb') as video:
-                            self.bot.send_video(chat_id, video, caption=f"{file_path.split('/')[-1] + " "+file_lang[lang_code]["load"]}")
+                            self.bot.send_video(chat_id, video, caption=f"{file_path.split('/')[-1]} {load_text}")
                     elif ext in ['pdf', 'txt']:
                         with open(file_path, 'rb') as belge:
-                            self.bot.send_document(chat_id, belge, caption=f"{file_path.split('/')[-1] + " "+file_lang[lang_code]["load"]}")
+                            self.bot.send_document(chat_id, belge, caption=f"{file_path.split('/')[-1]} {load_text}")
                     else:
                         self.bot.send_message(chat_id, {file_lang[lang_code]["unsupport"]})
                     self.bot.answer_callback_query(call.id)
