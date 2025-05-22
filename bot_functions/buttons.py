@@ -1,10 +1,12 @@
-from telebot.types import BotCommand, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo, ReplyKeyboardMarkup
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from settings.lang import lang
+from files.files import file_lang
+from pathlib import Path
 
 def get_start_buttons(lang_code="ru"):
     try:
         button_texts = lang[lang_code]["buttons"]
-        return InlineKeyboardMarkup(row_width=2).add(
+        return InlineKeyboardMarkup(row_width=3).add(
             InlineKeyboardButton(button_texts["connect"], callback_data="buy"),
             InlineKeyboardButton(button_texts["renew"], callback_data="renew"),
             InlineKeyboardButton(button_texts["active_keys"], callback_data="active_keys"),
@@ -12,6 +14,7 @@ def get_start_buttons(lang_code="ru"):
             InlineKeyboardButton(button_texts["change_country"], callback_data="change_country"),
             InlineKeyboardButton(button_texts["router_tv"], callback_data="router_tv"),
             InlineKeyboardButton(button_texts["invite"], callback_data="invite"),
+            InlineKeyboardButton(button_texts["example"], callback_data="examples"),
             InlineKeyboardButton(button_texts["partnership"], callback_data="partnership"),
         )
     except Exception as e:
@@ -68,4 +71,37 @@ class KeyboardHandler:
             InlineKeyboardButton("Router", callback_data="router"),
             InlineKeyboardButton("Android TV", callback_data="tv")
         )
+        return markup
+    
+
+    @staticmethod
+    def create_examples_keyboard(lang_code):
+        markup = InlineKeyboardMarkup(row_width=3)
+        markup.row(
+            InlineKeyboardButton(file_lang[lang_code]["Images"], callback_data="images"),
+            InlineKeyboardButton(file_lang[lang_code]["Videos"], callback_data="videos"),
+            InlineKeyboardButton(file_lang[lang_code]["Documents"], callback_data="doc"),
+
+        )
+        return markup
+    @staticmethod
+    def create_files_keyboard(file_list: list):
+        markup = InlineKeyboardMarkup(row_width=2)
+        keyboard_buttons = []
+        
+        for file in file_list:
+            file_name = file.name
+            # Klasör adı için pathlib kullanıyoruz
+            folder_name = Path(file.path).name  # Örneğin: "videos"
+            # Tam dosya yolu
+            full_path = f"{file.path}{file.name}"
+            # callback_data: file_{type}_{full_path}
+            callback_data = f"file_{full_path}"
+            # Düğme yazısı: videos/SampleVideo1280x7202mb.mp4
+            button = InlineKeyboardButton(text=f"{folder_name}/{file_name}", callback_data=callback_data)
+            keyboard_buttons.append(button)
+        
+        for i in range(0, len(keyboard_buttons), 2):
+            markup.row(*keyboard_buttons[i:i+2])
+        
         return markup

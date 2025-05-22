@@ -2,7 +2,6 @@ import threading
 import uvicorn
 import bot
 
-
 def run_uvicorn():
     uvicorn.run("pay:app", host="0.0.0.0", port=8000)
 

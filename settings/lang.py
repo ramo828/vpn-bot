@@ -15,7 +15,8 @@ lang["az"] = {
         "change_country": "Ölkəni dəyiş",
         "router_tv": "Routerlər və Android TV",
         "invite": "Dəvət et",
-        "partnership": "Tərəfdaşlıq"
+        "partnership": "Tərəfdaşlıq",
+        "example": "Nümunələr"
     },
     "commands": {
         "start": "Botu başlat",
@@ -97,7 +98,8 @@ lang["az"] = {
         "lang":"Botun dili: ",
         "success": "Botun dili dəyişdirildi.",
         "error": "Botun dili dəyişdiriləmedi. Zəhmət olmasa /start yazın.",
-        "device_question":"Hansı cihaz üçün təlimatları istəyirsiz?"
+        "device_question":"Hansı cihaz üçün təlimatları istəyirsiz?",
+        "example_question": "Hansı fayl tipində nümunələr görmək istəyirsiniz?"
     }
 }
 
@@ -116,7 +118,9 @@ lang["tr"] = {
         "change_country": "Ülkeyi değiştir",
         "router_tv": "Routerlar ve Android TV",
         "invite": "Davet et",
-        "partnership": "Ortaklık"
+        "partnership": "Ortaklık",
+        "example": "Örnekler"
+
     },
     "commands": {
         "start": "Botu başlat",
@@ -198,7 +202,8 @@ lang["tr"] = {
         "lang": "Botun dili: ",
         "success": "Botun dili dəyişdirildi",
         "error": "Botun dili dəyişdiriləmedi. Lütfen /start yazın.",
-        "device_question":"Hangi cihaz için talimatları istiyorsunuz?"
+        "device_question":"Hangi cihaz için talimatları istiyorsunuz?",
+        "example_question": "Hangi dosya türü örneklerini görmek istiyorsunuz?"
     }
 }
 
@@ -217,7 +222,8 @@ lang["ru"] = {
         "change_country": "Изменить страну",
         "router_tv": "В роутеры и Android TV",
         "invite": "Пригласить",
-        "partnership": "Партнерка"
+        "partnership": "Партнерка",
+        "example": "Примеры"
     },
     "commands": {
         "start": "Запустить бота",
@@ -300,7 +306,9 @@ lang["ru"] = {
         "lang": "Язык бота: ",
         "success": "Язык бота был изменён.",
         "error": "Не удалось изменить язык бота. Пожалуйста, введите /start.",
-        "device_question":"Для какого устройства вы хотите получить инструкции?"
+        "device_question":"Для какого устройства вы хотите получить инструкции?",
+        "example_question": "Какие примеры типов файлов вы хотите посмотреть?"
+
 }
 }
 
@@ -319,7 +327,9 @@ lang["en"] = {
         "change_country": "Change Country",
         "router_tv": "Router and Android TV",
         "invite": "Invite",
-        "partnership": "Partnership"
+        "partnership": "Partnership",
+        "example": "Examples"
+
     },
     "commands": {
         "start": "Start the bot",
@@ -401,6 +411,7 @@ lang["en"] = {
         "lang": "Bot language: ",
         "success": "Bot language has been changed.",
         "error": "Failed to change bot language. Please type /start.",
-        "device_question":"Which device do you want instructions for?"
+        "device_question":"Which device do you want instructions for?",
+        "example_question": "Which file type examples would you like to see?"
 }
 }

@@ -10,7 +10,10 @@ from urllib.parse import quote
 from settings.router_tv import info_router, info_tv
 from vpn_api import VPN
 from bot_functions.buttons import get_start_buttons, KeyboardHandler
+from files.files import files, file_lang
 import traceback
+import os
+
 
 class BotHandler:
     def __init__(self, bot, public_url):
@@ -260,6 +263,35 @@ class BotHandler:
             lang[lang_code]["info"]["device_question"],
             reply_markup=markup
         )
+    def handle_example(self, call, lang_code):
+        markup = KeyboardHandler.create_examples_keyboard(lang_code)
+        self.bot.send_message(
+            call.message.chat.id,
+            lang[lang_code]["info"]["example_question"],
+            reply_markup=markup
+        )
+
+    def handle_files(self, call, lang_code, type="images"):
+            bot_files = []
+            
+            if(type == "images"):
+                for file in files:
+                    if(file.type == "image"):
+                        bot_files.append(file)
+            if(type == "videos"):
+                for file in files:
+                    if(file.type == "video"):
+                        bot_files.append(file)
+            if(type == "doc"):
+                for file in files:
+                    if(file.type == "doc"):
+                        bot_files.append(file)
+            markup = KeyboardHandler.create_files_keyboard(file_list=bot_files)
+            self.bot.send_message(
+                call.message.chat.id,
+                lang[lang_code]["info"]["example_question"],
+                reply_markup=markup
+            )
 
     def handle_callback(self, call):
         try:
@@ -274,6 +306,7 @@ class BotHandler:
                 "change_protocol": self.handle_change_protocol,
                 "cancel": self.handle_cancel,
                 "router_tv": self.handle_router_tv,
+                "examples": self.handle_example,
                 "sub_1": lambda c, l: self.handle_subscription(c, l, 1),
                 "sub_3": lambda c, l: self.handle_subscription(c, l, 3),
                 "sub_6": lambda c, l: self.handle_subscription(c, l, 6),
@@ -284,9 +317,37 @@ class BotHandler:
                 "invite": lambda c, l: self.bot.send_message(c.message.chat.id, "https://t.me/uncencored_best_vpn_bot"),
                 "router": lambda c, l: self.bot.send_message(c.message.chat.id, info_router[lang_code]),
                 "tv": lambda c, l: self.bot.send_message(c.message.chat.id, info_tv[lang_code]),
+                "images": lambda c, l: self.handle_files(call=c, lang_code=l,type="images"),
+                "videos": lambda c, l: self.handle_files(call=c,lang_code=l,type="videos"),
+                "doc": lambda c, l: self.handle_files(call=c, lang_code=l,type="doc")
 
             }
-
+            # Dinamik dosya gönderimi için ek handler
+            if callback_data.startswith("file_"):
+                current_directory = os.getcwd()
+                file_path = current_directory+"/"+callback_data.split("_", 2)[1:][0]
+                chat_id = call.message.chat.id
+                try:
+                    ext = file_path.lower().split('.')[-1]
+                    if ext in ['jpg', 'jpeg', 'png']:
+                        with open(file_path, 'rb') as resim:
+                            self.bot.send_photo(chat_id, resim, caption=f"{file_path.split('/')[-1]} {file_lang[lang_code]["load"]}")
+                    elif ext in ['mp4', 'mov']:
+                        with open(file_path, 'rb') as video:
+                            self.bot.send_video(chat_id, video, caption=f"{file_path.split('/')[-1]} {file_lang[lang_code]["load"]}")
+                    elif ext in ['pdf', 'txt']:
+                        with open(file_path, 'rb') as belge:
+                            self.bot.send_document(chat_id, belge, caption=f"{file_path.split('/')[-1]} {file_lang[lang_code]["load"]}")
+                    else:
+                        self.bot.send_message(chat_id, {file_lang[lang_code]["unsupport"]})
+                    self.bot.answer_callback_query(call.id)
+                except FileNotFoundError:
+                    self.bot.send_message(chat_id, {file_lang[lang_code]["file_not_found"]})
+                    self.bot.answer_callback_query(call.id)
+                except Exception as e:
+                    self.bot.send_message(chat_id, f"{file_lang[lang_code]["error"]} - {e}")
+                    self.bot.answer_callback_query(call.id)
+                return
             handler = handlers.get(callback_data)
             if handler:
                 handler(call, lang_code)
