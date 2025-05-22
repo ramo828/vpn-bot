@@ -331,13 +331,13 @@ class BotHandler:
                     ext = file_path.lower().split('.')[-1]
                     if ext in ['jpg', 'jpeg', 'png']:
                         with open(file_path, 'rb') as resim:
-                            self.bot.send_photo(chat_id, resim, caption=f"{file_path.split('/')[-1]} {file_lang[lang_code]["load"]}")
+                            self.bot.send_photo(chat_id, resim, caption=f"{file_path.split('/')[-1] + " " +file_lang[lang_code]["load"]}")
                     elif ext in ['mp4', 'mov']:
                         with open(file_path, 'rb') as video:
-                            self.bot.send_video(chat_id, video, caption=f"{file_path.split('/')[-1]} {file_lang[lang_code]["load"]}")
+                            self.bot.send_video(chat_id, video, caption=f"{file_path.split('/')[-1] + " "+file_lang[lang_code]["load"]}")
                     elif ext in ['pdf', 'txt']:
                         with open(file_path, 'rb') as belge:
-                            self.bot.send_document(chat_id, belge, caption=f"{file_path.split('/')[-1]} {file_lang[lang_code]["load"]}")
+                            self.bot.send_document(chat_id, belge, caption=f"{file_path.split('/')[-1] + " "+file_lang[lang_code]["load"]}")
                     else:
                         self.bot.send_message(chat_id, {file_lang[lang_code]["unsupport"]})
                     self.bot.answer_callback_query(call.id)
