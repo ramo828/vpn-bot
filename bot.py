@@ -66,6 +66,11 @@ def send_message_to_admin(message):
 def send_message_to_user(telegram_id: int, message: str):
     vpn.json_data = {"name": str(telegram_id)}
     vpn_data = vpn.create_key()
+    db.update_vpn_status(
+                        telegram_id=telegram_id,
+                        vpn_server=vpn_data.get("accessUrl"),
+                        vpn_id=vpn_data.get("id")
+                    )
     bot.send_message(telegram_id, message)
     sleep(1/2)
     bot.send_message(telegram_id, vpn_data["accessUrl"])
