@@ -49,7 +49,15 @@ lang["az"] = {
         "button": "Ödə",
         "plan_query" : "Neçə aylıq tarif istəyirsiniz?"
     },
-    "start_message": "Salam! VPN yaratmaq üçün /create əmri yazın.",
+    "start_message": """
+    Hörmətli istifadəçilər,
+
+        Bu, yüksək səviyyəli təhlükəsizlik və məxfiliyi təmin edən VPN botudur. 
+        Bu bot vasitəsilə internetdəki senzura məhdudiyyətlərindən azad ola, şəxsi məlumatlarınızı qoruya və onlayn fəaliyyətlərinizi təhlükəsiz şəkildə həyata keçirə bilərsiniz. 
+        VPN xidmətimiz sürətli, etibarlı və istifadəsi asan bir platforma təqdim edir. 
+        Coğrafi məhdudiyyətləri aradan qaldıraraq istənilən məzmuna daxil olmaq, məlumatlarınızı şifrələmək və kiber təhlükələrdən qorunmaq üçün ən yaxşı həllərdən biridir. 
+        Bu bot, istifadəçi dostu interfeysi ilə hər kəs üçün təhlükəsiz internet təcrübəsini təmin edir.
+""",
     "vpn_created": "VPN açarı yaradıldı",
     "vpn_error": "VPN yaratmaqda xəta baş verdi. Zəhmət olmasa bir az sonra yenidən cəhd edin.",
     "vpn_already_exists": "VPN artıq yaradılıb. Yenidən yaratmaq üçün /delete əmri yazın.",
@@ -154,7 +162,16 @@ lang["tr"] = {
         "button": "Şimdi Öde",
         "plan_query" : "Ne kadar süreli bir plan istiyorsunuz?"
     },
-    "start_message": "Merhaba! VPN oluşturmak için /create komutunu yazın.",
+    "start_message": """
+    Sayın Kullanıcılar,
+
+        Bu, yüksek düzeyde güvenlik ve gizlilik sağlayan bir VPN botudur. 
+        Bu bot aracılığıyla internetteki sansür kısıtlamalarından kurtulabilir, kişisel verilerinizi koruyabilir ve çevrimiçi faaliyetlerinizi güvenli bir şekilde gerçekleştirebilirsiniz. 
+        VPN hizmetimiz hızlı, güvenilir ve kullanımı kolay bir platform sunar. 
+        Coğrafi kısıtlamaları kaldırarak istediğiniz içeriğe erişmek, verilerinizi şifrelemek ve siber tehditlerden korunmak için en iyi çözümlerden biridir. 
+        Kullanıcı dostu arayüzü ile bu bot, herkes için güvenli bir internet deneyimi sunar.
+
+""",
     "vpn_created": "VPN anahtarı oluşturuldu",
     "vpn_error": "VPN oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
     "vpn_already_exists": "VPN zaten oluşturulmuş. Yeniden oluşturmak için /delete komutunu girin.",
@@ -260,7 +277,15 @@ lang["ru"] = {
         "plan_query" : "Необходимо выбрать тарифный план на сколько месяцев?"
 
     },
-    "start_message": "Привет! Чтобы создать VPN, используйте команду /create.",
+    "start_message": """
+    Уважаемые пользователи,
+
+        Это VPN-бот, обеспечивающий высокий уровень безопасности и конфиденциальности. 
+        С помощью этого бота вы можете обойти цензуру в интернете, защитить свои личные данные и безопасно осуществлять онлайн-деятельность. 
+        Наш VPN-сервис предлагает быструю, надежную и простую в использовании платформу. 
+        Это одно из лучших решений для устранения географических ограничений, шифрования данных и защиты от киберугроз. 
+        Благодаря удобному интерфейсу этот бот обеспечивает безопасный интернет-опыт для всех пользователей.
+""",
     "vpn_created": "VPN ключ успешно создан",
     "vpn_error": "Ошибка при создании VPN. Пожалуйста, попробуйте позже.",
     "vpn_already_exists": "VPN уже создан. Чтобы создать заново, используйте /delete.",
@@ -367,7 +392,16 @@ lang["en"] = {
         "button": "Pay Now",
         "plan_query" : "What duration plan do you want?"
     },
-    "start_message": "Hello! To create a VPN, type /create.",
+    "start_message": """
+    Dear Users,
+
+        This is a VPN bot designed to provide a high level of security and privacy. 
+        Through this bot, you can bypass internet censorship, protect your personal information, and conduct your online activities securely. 
+        Our VPN service offers a fast, reliable, and user-friendly platform. 
+        It is one of the best solutions for overcoming geographical restrictions, encrypting your data, and safeguarding against cyber threats. 
+        With its intuitive interface, this bot ensures a secure internet experience for all users.
+
+    """,
     "vpn_created": "VPN key has been created",
     "vpn_error": "An error occurred while creating the VPN. Please try again later.",
     "vpn_already_exists": "VPN already exists. To recreate, use the /delete command.",

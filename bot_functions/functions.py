@@ -177,6 +177,7 @@ class BotHandler:
         )
 
     def run_payment_app(self, message, lang_code, months=1):
+        print(lang_code)
         markup = InlineKeyboardMarkup(row_width=design["payment_row_width"])
         month = {
             1: "one_month",

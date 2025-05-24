@@ -6,6 +6,9 @@ from settings.setting import setting  # Konfiqurasiya faylı
 import urllib3
 from bot_functions.functions import BotHandler  # Bot əməliyyatlarını tənzimləyən sinif
 from utility.util import start_telebit, get_lang_code  # Yardımçı funksiyalar
+from vpn_api import VPN
+from time import sleep
+vpn = VPN()
 
 # SSL xəbərdarlıqlarını bağlayırıq (HTTP/HTTPS problemlərinə görə)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -61,7 +64,11 @@ def send_message_to_admin(message):
 
 # İstifadəçiyə birbaşa mesaj göndərmək üçün funksiya
 def send_message_to_user(telegram_id: int, message: str):
+    vpn.json_data = {"name": str(telegram_id)}
+    vpn_data = vpn.create_key()
     bot.send_message(telegram_id, message)
+    sleep(1/2)
+    bot.send_message(telegram_id, vpn_data["accessUrl"])
 
 def success_callback(month:int, telegram_id:int):
     data = db.get_user_by_telegram_id(telegram_id)
@@ -69,7 +76,8 @@ def success_callback(month:int, telegram_id:int):
     if(data[6] is not None):
         bot.send_message(telegram_id, data[6]+" "+ data[7])
     else:
-        bot.send_message(telegram_id, lang[lang_code]["start_message"])
+        pass
+        # bot.send_message(telegram_id, lang[lang_code]["start_message"])
 
 # Callback sorğularını yönləndirən handler
 @bot.callback_query_handler(func=lambda call: True)
