@@ -75,7 +75,7 @@ async def payment_status(status: bool = Query(..., description="Payment status")
         sleep(5)
         send_message_to_admin(f"Payment was successful for user: {telegram_id}")
         clear_pay_message()
-        success_callback(telegram_id=telegram_id, month=plan_month)
+        # success_callback(telegram_id=telegram_id, month=plan_month)
         return JSONResponse({"message": lng[payment_lang]["payment"]["pay_success_message"]+" "+plan_name, "success": True})
     else:
         db.update_vpn_access(0, telegram_id)
