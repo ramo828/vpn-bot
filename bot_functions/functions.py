@@ -177,7 +177,6 @@ class BotHandler:
         )
 
     def run_payment_app(self, message, lang_code, months=1):
-        print(lang_code)
         markup = InlineKeyboardMarkup(row_width=design["payment_row_width"])
         month = {
             1: "one_month",
@@ -194,7 +193,7 @@ class BotHandler:
             f"&accountId={message.from_user.id}"
             f"&invoiceId=inv_{message.from_user.id}"
             f"&tg_id={self.default_user_id}"
-            f"&lang={lang_code}"
+            f"&language={lang_code}"
         )
         web_app = WebAppInfo(url=web_app_url)
         markup.add(InlineKeyboardButton(lang[lang_code]["payment"]["button"], web_app=web_app))

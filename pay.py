@@ -36,13 +36,12 @@ async def payment_page(
     invoiceId: Optional[str] = Query(None, description="Invoice ID"),
     skin: Optional[str] = Query("mini", description="Widget skin"),
     data: Optional[str] = Query("{}", description="Extra data as JSON string"),
-    language: Optional[str] = Query("tr", description="Language code (az, tr, en, ru)")
+    language: Optional[str] = Query("en", description="Language code (az, tr, en, ru)")
 ):
     global telegram_id
     global default_language
     global plan_name
     global plan_month
-
     plan_name = "one_month" if plan == 1 else "three_months" if plan == 2 else "six_months" if plan == 6 else "one_year"
     plan_month = plan
     telegram_id = str(tg_id)
