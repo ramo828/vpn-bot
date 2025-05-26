@@ -66,9 +66,10 @@ async def payment_page(
 @app.get("/payment_status")
 async def payment_status(status: bool = Query(..., description="Payment status")):
     if status:
+        print("Get month: , ",plan_month)
         print("Payment was successful")
         db.update_vpn_access(1, telegram_id)
-        db.set_user_plan(plan_month, telegram_id)
+        db.set_user_plan(plan=plan_month, telegram_id=telegram_id)
         payment_lang = db.get_user_language(telegram_id)
         send_message_to_user(int(telegram_id), lng[payment_lang]["payment"]["pay_success_message"]+ " " +plan_name)
         sleep(5)

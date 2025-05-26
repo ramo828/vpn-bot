@@ -76,6 +76,7 @@ class BotHandler:
         lang_code = get_lang_code(message)
         try:
             data = self.db.get_user_by_telegram_id(message.from_user.id)
+            sub_data = self.db.get_remaining_subscription_time(message.from_user.id)
             if data:
                 user_info = f"""
     {self.seperator}
@@ -90,6 +91,8 @@ class BotHandler:
             {lang[lang_code]["info"]["lang"]}: {data[10]}
             {lang[lang_code]["vpn_data"]["create_date"]}: {data[11]}
             {lang[lang_code]["vpn_data"]["update_date"]}: {data[12]}
+            {payment[lang_code]["plan_text"]["remaining_days"]}: {sub_data["remaining_days"]}
+            {payment[lang_code]["plan_text"]["end_date"]}: {sub_data["end_date"]}
     {self.seperator}
                 """
             else:
@@ -147,7 +150,7 @@ class BotHandler:
             self.bot.reply_to(message, lang[lang_code]['error_bot'])
 
     def send_web_app(self, message, lang_code):
-        if self.db.is_vpn_active(message.from_user.id):
+        if self.db.is_vpn_active(self.default_user_id):
             self.bot.send_message(message.chat.id, lang[lang_code]["vpn_already_exists"])
             return
         markup = InlineKeyboardMarkup(row_width=design["plan_row_width"])
@@ -205,11 +208,18 @@ class BotHandler:
 
     # Yeni callback işleyicileri
     def handle_buy(self, call, lang_code):
-        user_data = self.db.get_user_by_telegram_id(call.from_user.id)
-        user_vpn_status = self.db.is_vpn_active(call.from_user.id)
-        if user_vpn_status is None:
+        user_data = self.db.get_user_by_telegram_id(self.default_user_id)
+        user_vpn_status = self.db.is_vpn_active(self.default_user_id)
+
+        if user_vpn_status is not None:
             if user_data[6]:
+                sub_data = self.db.get_remaining_subscription_time(self.default_user_id)
+                info = f"{payment[lang_code]['plan_text']['remaining_days']}: {sub_data['remaining_days']}\n{payment[lang_code]['plan_text']['end_date']}: {sub_data['end_date']}"
+                self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['vpn_already_exists']}", parse_mode="Markdown")
+                sleep(1/3)
+                self.bot.send_message(call.message.chat.id, info, parse_mode="Markdown")
                 self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']} {user_data[6]}", parse_mode="Markdown")
+
             else:
                 self.bot.send_message(call.message.chat.id, lang[lang_code]['keys']['key_not_found'])
                 self.send_web_app(call.message, lang_code)
@@ -238,9 +248,13 @@ class BotHandler:
         self.bot.send_message(call.message.chat.id, lang[lang_code]["servers"]["question"], reply_markup=markup)
 
     def handle_active_keys(self, call, lang_code):
-        user_data = self.db.get_user_by_telegram_id(call.from_user.id)
+        user_data = self.db.get_user_by_telegram_id(self.default_user_id)
         if user_data and user_data[6]:
+            sub_data = self.db.get_remaining_subscription_time(self.default_user_id)
+            info = f"{payment[lang_code]['plan_text']['remaining_days']}: {sub_data['remaining_days']}\n{payment[lang_code]['plan_text']['end_date']}: {sub_data['end_date']}"
             self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']} {user_data[6]}", parse_mode="Markdown")
+            sleep(1/3)
+            self.bot.send_message(call.message.chat.id, info, parse_mode="Markdown")
         else:
             self.bot.send_message(call.message.chat.id, lang[lang_code]['keys']['key_not_found'])
             sleep(1)

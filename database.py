@@ -1,4 +1,6 @@
+from datetime import datetime, timedelta
 import sqlite3
+import pytz
 
 class Database:
     def __init__(self, db_name=':memory:'):
@@ -138,18 +140,63 @@ class Database:
         with self.connection:
             cur = self.connection.cursor()
             cur.execute(
-                'UPDATE users SET language = ?, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?',
+                'UPDATE users SET language = ? WHERE telegram_id = ?',
                 (lang_code, telegram_id)
             )
 
     def set_user_plan(self, telegram_id, plan):
         # Kullanıcı planını günceller
+        print(f"Setting plan {plan} for user {telegram_id}")
         with self.connection:
             cur = self.connection.cursor()
             cur.execute(
                 'UPDATE users SET plan = ?, updated_at = CURRENT_TIMESTAMP WHERE telegram_id = ?',
                 (plan, telegram_id)
             )
+
+    def get_remaining_subscription_time(self, telegram_id):
+        # Kullanıcının abonelik süresinin kalan gün sayısını ve bitiş tarihini döner
+        cur = self.connection.cursor()
+        cur.execute(
+            'SELECT updated_at, plan FROM users WHERE telegram_id = ?',
+            (telegram_id,)
+        )
+        row = cur.fetchone()
+        
+        if not row:
+            return None  # Kullanıcı bulunamadı
+        
+        updated_at, plan = row
+        if plan == 0:
+            return {'remaining_days': 0, 'end_date': None}  # Aktif abonelik planı yok
+        
+        # updated_at'ı datetime nesnesine çevir ve UTC saat dilimini ata
+        try:
+            subscription_start = datetime.strptime(updated_at, '%Y-%m-%d %H:%M:%S')
+            subscription_start = pytz.UTC.localize(subscription_start)
+        except ValueError:
+            return {'remaining_days': 0, 'end_date': None}  # Geçersiz tarih formatı
+        
+        # Plan süresini gün cinsinden hesapla (örneğin, plan=1 ise 30 gün)
+        subscription_duration = timedelta(days=30 * plan)
+        
+        # Bitiş tarihini hesapla
+        end_date = subscription_start + subscription_duration
+        
+        # Şu anki zamanı al (UTC)
+        current_time = datetime.now(pytz.UTC)
+        
+        # Kalan süreyi hesapla
+        time_remaining = end_date - current_time
+        
+        # Kalan gün sayısını ve bitiş tarihini formatla
+        if time_remaining.total_seconds() > 0:
+            return {
+                'remaining_days': time_remaining.days,
+                'end_date': end_date.strftime('%Y-%m-%d')
+            }
+        return {'remaining_days': 0, 'end_date': end_date.strftime('%Y-%m-%d')}
+
 
     def close(self):
         # Veritabanı bağlantısını kapatır
