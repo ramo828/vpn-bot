@@ -2,7 +2,7 @@
 setting = dict()
 
 # Telegram botun TOKEN dəyəri — bu, botun Telegram API ilə əlaqə qurması üçün istifadə olunur
-setting['TOKEN'] = ""
+setting['TOKEN'] = "your telegram key"
 
 # Botun idarəçisi olan istifadəçilərin Telegram ID-ləri
 setting['ADMIN_ID'] = ["464865073", "975254813", "1951682890"]
