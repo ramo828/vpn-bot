@@ -23,7 +23,10 @@ file_lang = {
         "load": "göndərilir...",
         "unsupport": "Bu fayl növü dəstəklənmir.",
         "file_not_found": "Fayl tapılmadı, xahiş edirik fayl yolunu yoxlayın.",
-        "error": "Fayl göndərilərkən xəta baş verdi"
+        "error": "Fayl göndərilərkən xəta baş verdi",
+        "offer": "Təklif",
+        "offer_text": "Təklif və Şərtlər",
+
     },
     "ru": {
         "Images": "Изображения",
@@ -32,7 +35,9 @@ file_lang = {
         "load": "отправляется...",
         "unsupport": "Этот тип файла не поддерживается.",
         "file_not_found": "Файл не найден, пожалуйста, проверьте путь к файлу.",
-        "error": "Ошибка при отправке файла"
+        "error": "Ошибка при отправке файла",
+        "offer": "Оферта",
+        "offer_text": "Оферта и Условия",
     },
     "en": {
         "Images": "Images",
@@ -41,7 +46,9 @@ file_lang = {
         "load": "sending...",
         "unsupport": "This file type is not supported.",
         "file_not_found": "File not found, please check the file path.",
-        "error": "Error while sending the file"
+        "error": "Error while sending the file",
+        "offer": "Offer",
+        "offer_text": "Offer and Terms",
     },
     "tr": {
         "Images": "Görüntüler",
@@ -51,5 +58,7 @@ file_lang = {
         "unsupport":"Bu dosya türü desteklenmiyor.",
         "file_not_found":"Dosya bulunamadı, lütfen dosya yolunu kontrol edin.",
         "error":"Dosya gönderilirken hata",
+        "offer":"Teklif",
+        "offer_text": "Teklif ve Şartlar"
     }
 }

@@ -1,4 +1,4 @@
-from telebot.types import BotCommand, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo, ReplyKeyboardMarkup
+from telebot.types import BotCommand, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 from database import Database
 from settings.lang import lang
 from settings.setting import setting
@@ -12,6 +12,7 @@ from vpn_api import VPN
 from bot_functions.buttons import get_start_buttons, KeyboardHandler
 from files.files import files, file_lang
 from settings.design import design
+import urllib.parse
 import traceback
 from time import sleep
 import os
@@ -206,6 +207,38 @@ class BotHandler:
             reply_markup=markup
         ))
 
+    def run_contract_app(self, message, lang_code):
+        # Dinamik parametreler (örneğin, mesajdan veya kullanıcıdan alınabilir)
+        user_email = "ramosoft94@gmail.com"  # Dinamik hale getirmek için message.from_user.email kullanılabilir
+        site_url = "https://t.me/uncencored_best_vpn_bot"
+        bot_url = "https://t.me/uncencored_best_vpn_bot"
+
+        # URL parametrelerini kodlama
+        encoded_email = urllib.parse.quote(user_email)
+        encoded_site = urllib.parse.quote(site_url)
+        encoded_bot_url = urllib.parse.quote(bot_url)
+
+        # Web app URL'sini oluştur
+        web_app_url = (
+            f"{self.public_url}/contract"
+            f"?email={encoded_email}"
+            f"&site={encoded_site}"
+            f"&bot_url={encoded_bot_url}"
+        )
+
+        # Inline keyboard markup oluştur
+        markup = InlineKeyboardMarkup(row_width=2)  # design["payment_row_width"] yerine sabit bir değer
+        web_app = WebAppInfo(url=web_app_url)
+        markup.add(InlineKeyboardButton(file_lang[lang_code]["offer"], web_app=web_app))
+
+        # Mesajı gönder
+        self.bot.send_message(
+            message.chat.id,
+            file_lang[lang_code]["offer_text"],
+            reply_markup=markup
+        )
+
+
     # Yeni callback işleyicileri
     def handle_buy(self, call, lang_code):
         user_data = self.db.get_user_by_telegram_id(self.default_user_id)
@@ -218,7 +251,9 @@ class BotHandler:
                 self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['vpn_already_exists']}", parse_mode="Markdown")
                 sleep(1/3)
                 self.bot.send_message(call.message.chat.id, info, parse_mode="Markdown")
-                self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']} {user_data[6]}", parse_mode="Markdown")
+                self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']}", parse_mode="Markdown")
+                sleep(1/3)
+                self.bot.send_message(call.message.chat.id, f"{user_data[6]}", parse_mode="Markdown")
 
             else:
                 self.bot.send_message(call.message.chat.id, lang[lang_code]['keys']['key_not_found'])
@@ -252,7 +287,9 @@ class BotHandler:
         if user_data and user_data[6]:
             sub_data = self.db.get_remaining_subscription_time(self.default_user_id)
             info = f"{payment[lang_code]['plan_text']['remaining_days']}: {sub_data['remaining_days']}\n{payment[lang_code]['plan_text']['end_date']}: {sub_data['end_date']}"
-            self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']} {user_data[6]}", parse_mode="Markdown")
+            self.bot.send_message(call.message.chat.id, f"{lang[lang_code]['keys']['active_key_info']}", parse_mode="Markdown")
+            sleep(1/3)
+            self.bot.send_message(call.message.chat.id, f"{user_data[6]}", parse_mode="Markdown")
             sleep(1/3)
             self.bot.send_message(call.message.chat.id, info, parse_mode="Markdown")
         else:
@@ -274,6 +311,9 @@ class BotHandler:
 
     def handle_subscription(self, call, lang_code, months):
         self.run_payment_app(call.message, lang_code, months=months)
+
+    def handle_policy(self, call, lang_code):
+        self.run_contract_app(call.message, lang_code)
 
     def handle_partnership(self, call, lang_code):
         for partner in partners:
@@ -351,7 +391,9 @@ class BotHandler:
                 "tv": lambda c, l: self.bot.send_message(c.message.chat.id, info_tv[lang_code]),
                 "images": lambda c, l: self.handle_files(call=c, lang_code=l,type="images"),
                 "videos": lambda c, l: self.handle_files(call=c,lang_code=l,type="videos"),
-                "doc": lambda c, l: self.handle_files(call=c, lang_code=l,type="doc")
+                "doc": lambda c, l: self.handle_files(call=c, lang_code=l,type="doc"),
+                "policy": lambda c, l: self.handle_policy(call=c, lang_code=l),
+
 
             }
             # Dinamik dosya gönderimi için ek handler

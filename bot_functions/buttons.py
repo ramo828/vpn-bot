@@ -85,6 +85,8 @@ class KeyboardHandler:
             InlineKeyboardButton(file_lang[lang_code]["Images"], callback_data="images"),
             InlineKeyboardButton(file_lang[lang_code]["Videos"], callback_data="videos"),
             InlineKeyboardButton(file_lang[lang_code]["Documents"], callback_data="doc"),
+            InlineKeyboardButton(file_lang[lang_code]["offer"], callback_data="policy"),
+
 
         )
         return markup

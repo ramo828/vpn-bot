@@ -7,6 +7,7 @@ from settings.setting import setting
 from time import sleep
 from database import Database
 from html_data.pay_data import get_html
+from html_data.contract import generate_privacy_policy
 from bot import send_message_to_admin, send_message_to_user, clear_pay_message, success_callback
 import json
 
@@ -61,6 +62,21 @@ async def payment_page(
         skin=skin,
         data_dict=data_dict,
         language=language
+    ))
+
+
+@app.get("/contract", response_class=HTMLResponse)
+async def contract_page(
+        email: str = Query("example@example.com", description="User email"),
+        site: str = Query("https://example.com", description="Site URL"),
+        bot_url: str = Query("https://t.me/example_bot", description="Bot URL"),
+
+):
+
+    return HTMLResponse(generate_privacy_policy(
+        email=email,
+        site_url=site,
+        bot_url=bot_url
     ))
 
 @app.get("/payment_status")
