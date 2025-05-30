@@ -209,7 +209,7 @@ class BotHandler:
 
     def run_contract_app(self, message, lang_code):
         # Dinamik parametreler (örneğin, mesajdan veya kullanıcıdan alınabilir)
-        user_email = "ramosoft94@gmail.com"  # Dinamik hale getirmek için message.from_user.email kullanılabilir
+        user_email = "bestvpnuncencored@gmail.com"  # Dinamik hale getirmek için message.from_user.email kullanılabilir
         site_url = "https://t.me/uncencored_best_vpn_bot"
         bot_url = "https://t.me/uncencored_best_vpn_bot"
 

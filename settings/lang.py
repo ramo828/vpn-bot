@@ -16,7 +16,7 @@ lang["az"] = {
         "router_tv": "Routerlər və Android TV",
         "invite": "Dəvət et",
         "partnership": "Tərəfdaşlıq",
-        "example": "Nümunələr"
+        "example": "Kömək"
     },
     "commands": {
         "start": "Botu başlat",
@@ -128,7 +128,7 @@ lang["tr"] = {
         "router_tv": "Routerlar ve Android TV",
         "invite": "Davet et",
         "partnership": "Ortaklık",
-        "example": "Örnekler"
+        "example": "Yardım"
 
     },
     "commands": {
@@ -243,7 +243,7 @@ lang["ru"] = {
         "router_tv": "В роутеры и Android TV",
         "invite": "Пригласить",
         "partnership": "Партнерка",
-        "example": "Примеры"
+        "example": "Помощь"
     },
     "commands": {
         "start": "Запустить бота",
@@ -358,7 +358,7 @@ lang["en"] = {
         "router_tv": "Router and Android TV",
         "invite": "Invite",
         "partnership": "Partnership",
-        "example": "Examples"
+        "example": "Help"
 
     },
     "commands": {
