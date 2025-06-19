@@ -12,14 +12,14 @@ files = {
     FileModel(name="SampleJPGImage100kbmb.jpg", path="files/images/", type="image"),
     FileModel(name="SampleJPGImage200kbmb.jpg", path="files/images/", type="image"),
     FileModel(name="SampleJPGImage500kbmb.jpg", path="files/images/", type="image"),
-    FileModel(name="SamplePDFFile5mb.pdf", path="files/documents/", type="doc"),
+    FileModel(name="rekvizit.pdf", path="files/documents/", type="doc"),
 }
 
 file_lang = {
     "az": {
         "Images": "Şəkillər",
         "Videos": "Videolar",
-        "Documents": "Sənədlər",
+        "Documents": "Rekvizit",
         "load": "göndərilir...",
         "unsupport": "Bu fayl növü dəstəklənmir.",
         "file_not_found": "Fayl tapılmadı, xahiş edirik fayl yolunu yoxlayın.",
@@ -31,7 +31,7 @@ file_lang = {
     "ru": {
         "Images": "Изображения",
         "Videos": "Видео",
-        "Documents": "Документы",
+        "Documents": "Реквизит",
         "load": "отправляется...",
         "unsupport": "Этот тип файла не поддерживается.",
         "file_not_found": "Файл не найден, пожалуйста, проверьте путь к файлу.",
@@ -42,7 +42,7 @@ file_lang = {
     "en": {
         "Images": "Images",
         "Videos": "Videos",
-        "Documents": "Documents",
+        "Documents": "Equipment",
         "load": "sending...",
         "unsupport": "This file type is not supported.",
         "file_not_found": "File not found, please check the file path.",
@@ -53,7 +53,7 @@ file_lang = {
     "tr": {
         "Images": "Görüntüler",
         "Videos": "Videolar",
-        "Documents": "Belgeler",
+        "Documents": "Gereksinim",
         "load":"gönderiliyor...",
         "unsupport":"Bu dosya türü desteklenmiyor.",
         "file_not_found":"Dosya bulunamadı, lütfen dosya yolunu kontrol edin.",

@@ -227,6 +227,8 @@ class BotHandler:
         )
 
         # Inline keyboard markup oluştur
+        url1 = "https://telegra.ph/Politika-obrabotki-personalnyh-dannyh-uncensored-vpn-bot-06-19"
+        url2= "https://telegra.ph/Soglashenie-ob-ispolzovanii-materialov-i-servisov-internet-sajta-01-17"
         markup = InlineKeyboardMarkup(row_width=2)  # design["payment_row_width"] yerine sabit bir değer
         web_app = WebAppInfo(url=web_app_url)
         markup.add(InlineKeyboardButton(file_lang[lang_code]["offer"], web_app=web_app))
@@ -234,7 +236,7 @@ class BotHandler:
         # Mesajı gönder
         self.bot.send_message(
             message.chat.id,
-            file_lang[lang_code]["offer_text"],
+            file_lang[lang_code]["offer_text"]+f"\n{self.seperator}\n{url1}\n{self.seperator}\n{url2}\n{self.seperator}+\n",
             reply_markup=markup
         )
 
