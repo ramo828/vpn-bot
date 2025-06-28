@@ -194,7 +194,7 @@ class BotHandler:
             f"&currency={payment[lang_code]['price_settings'][month[months]]['currency']}"
             f"&plan={months}"
             f"&description={quote(lang[lang_code]['payment']['description'])}"
-            f"&accountId={setting["cloud_account_id"]}"
+            f"&accountId={setting['cloud_account_id']}"
             f"&invoiceId=inv_{message.from_user.id}"
             f"&tg_id={self.default_user_id}"
             f"&language={lang_code}"
