@@ -21,3 +21,6 @@ setting['pay_server_port'] = "8080"
 
 # Bulud (cloud) API açarı — bu, xarici xidmətlərlə əlaqə qurmaq üçün istifadə oluna bilər
 setting['cloud_api'] = "pk_9eab017c3962be28818ee038583db"
+# Ödəmə sisteminin hesap açarı
+setting['cloud_account_id'] = "ece64bcf1a4611c4c7ef03f308981f33"
+

@@ -32,7 +32,7 @@ async def payment_page(
     currency: str = Query("RUB", description="Currency"),
     plan: int = Query(..., description="Payment plan"),
     description: str = Query("Ödeme işlemi", description="Payment description"),
-    accountId: str = Query("user@example.com", description="User account ID"),
+    accountId: str = Query("ece64bcf1a4611c4c7ef03f308981f33", description="Payment account ID"),
     tg_id: int = Query(..., description="User Telegram ID"),
     invoiceId: Optional[str] = Query(None, description="Invoice ID"),
     skin: Optional[str] = Query("mini", description="Widget skin"),
@@ -56,7 +56,7 @@ async def payment_page(
         amount=amount,
         currency=currency,
         plan=plan,
-        description=lng[default_language]["payment"]["description"],
+        description=description,
         accountId=accountId,
         invoiceId=invoiceId,
         skin=skin,
@@ -81,20 +81,20 @@ async def contract_page(
 
 @app.get("/payment_status")
 async def payment_status(status: bool = Query(..., description="Payment status")):
+    payment_lang = db.get_user_language(telegram_id)
     if status:
         print("Get month: , ",plan_month)
         print("Payment was successful")
         db.update_vpn_access(1, telegram_id)
         db.set_user_plan(plan=plan_month, telegram_id=telegram_id)
-        payment_lang = db.get_user_language(telegram_id)
         send_message_to_user(int(telegram_id), lng[payment_lang]["payment"]["pay_success_message"]+ " " +plan_name)
         sleep(5)
         send_message_to_admin(f"Payment was successful for user: {telegram_id}")
-        clear_pay_message()
         # success_callback(telegram_id=telegram_id, month=plan_month)
         return JSONResponse({"message": lng[payment_lang]["payment"]["pay_success_message"]+" "+plan_name, "success": True})
     else:
         db.update_vpn_access(0, telegram_id)
+        clear_pay_message()
         print("Payment failed")
         send_message_to_user(int(telegram_id), lng[payment_lang]["payment"]["pay_error_message"])
         sleep(5)

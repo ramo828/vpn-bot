@@ -194,7 +194,7 @@ class BotHandler:
             f"&currency={payment[lang_code]['price_settings'][month[months]]['currency']}"
             f"&plan={months}"
             f"&description={quote(lang[lang_code]['payment']['description'])}"
-            f"&accountId={message.from_user.id}"
+            f"&accountId={setting["cloud_account_id"]}"
             f"&invoiceId=inv_{message.from_user.id}"
             f"&tg_id={self.default_user_id}"
             f"&language={lang_code}"
@@ -263,7 +263,7 @@ class BotHandler:
         else:
             self.bot.send_message(call.message.chat.id, lang[lang_code]['keys']['key_not_found'])
             self.send_web_app(call.message, lang_code)
-            if not user_data[6] and user_vpn_status:
+            if not user_data[6] and user_vpn_status == 1:
                 self.create(call.message)
 
     def handle_renew(self, call, lang_code):
