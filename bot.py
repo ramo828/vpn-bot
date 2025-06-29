@@ -64,18 +64,8 @@ def send_message_to_admin(message):
 
 # İstifadəçiyə birbaşa mesaj göndərmək üçün funksiya
 def send_message_to_user(telegram_id: int, message: str):
-    if not db.is_vpn_active(telegram_id=telegram_id):
-        print("Ödəniş uğurlu olmadı")
-    # vpn.json_data = {"name": str(telegram_id)}
-    # vpn_data = vpn.create_key()
-    # db.update_vpn_status(
-    #                     telegram_id=telegram_id,
-    #                     vpn_server=vpn_data.get("accessUrl"),
-    #                     vpn_id=vpn_data.get("id")
-                    # )
     bot.send_message(telegram_id, message)
-    sleep(1/2)
-    # bot.send_message(telegram_id, vpn_data["accessUrl"])
+   
 
 def success_callback(month:int, telegram_id:int):
     data = db.get_user_by_telegram_id(telegram_id)

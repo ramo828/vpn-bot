@@ -8,9 +8,11 @@ from time import sleep
 from database import Database
 from html_data.pay_data import get_html
 from html_data.contract import generate_privacy_policy
-from bot import send_message_to_admin, send_message_to_user, clear_pay_message, success_callback
-import json
+from bot import send_message_to_admin, send_message_to_user, clear_pay_message
+from vpn_api import VPN
 
+import json
+vpn = VPN()
 app = FastAPI()
 db = Database(setting['db_filename'])
 plan_name = ""
@@ -87,7 +89,16 @@ async def payment_status(status: bool = Query(..., description="Payment status")
         print("Payment was successful")
         db.update_vpn_access(1, telegram_id)
         db.set_user_plan(plan=plan_month, telegram_id=telegram_id)
+        vpn.json_data = {"name": str(telegram_id)}
+        vpn_data = vpn.create_key()
+        db.update_vpn_status(
+                        telegram_id=telegram_id,
+                        vpn_server=vpn_data.get("accessUrl"),
+                        vpn_id=vpn_data.get("id")
+                    )
         send_message_to_user(int(telegram_id), lng[payment_lang]["payment"]["pay_success_message"]+ " " +plan_name)
+        sleep(1/3)
+        send_message_to_user(int(telegram_id), vpn_data["accessUrl"])
         sleep(5)
         send_message_to_admin(f"Payment was successful for user: {telegram_id}")
         # success_callback(telegram_id=telegram_id, month=plan_month)
